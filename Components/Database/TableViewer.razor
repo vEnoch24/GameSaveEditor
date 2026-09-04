@@ -1,0 +1,176 @@
+﻿@using System.Globalization
+
+<div class="table-view">
+    <div class="table-header">
+        <div>
+            <div class="eyebrow">TABLE</div>
+            <h1>@Table.Name</h1>
+            <div class="table-summary">
+                @Table.Columns.Count columns
+                <span>•</span>
+                @Table.RowCount.ToString("N0") rows
+            </div>
+        </div>
+
+        <div class="table-actions">
+            <button class="btn btn-secondary" @onclick="ReloadAsync">
+                ↻ Refresh
+            </button>
+        </div>
+    </div>
+
+    <div class="schema-strip">
+        @foreach (var column in Table.Columns)
+        {
+            <div class="column-chip">
+                <span class="column-name">@column.Name</span>
+                <span class="column-type">@column.DataType</span>
+
+                @if (column.IsPrimaryKey)
+                {
+                    <span class="pk-badge">PK</span>
+                }
+
+                @if (column.IsNotNull)
+                {
+                    <span class="required-badge">NOT NULL</span>
+                }
+            </div>
+        }
+    </div>
+
+    <div class="toolbar">
+        <div class="search-box">
+            <span class="search-icon">⌕</span>
+
+            <input placeholder="Search loaded rows..."
+                   @bind="_search"
+                   @bind:event="oninput" />
+
+            @if (!string.IsNullOrEmpty(_search))
+            {
+                <button class="clear-search"
+                        @onclick="() => _search = string.Empty">
+                    ×
+                </button>
+            }
+        </div>
+
+        <div class="toolbar-info">
+            @FilteredRows.Count.ToString("N0") visible
+            <span>•</span>
+            first @DatabaseConfiguration.MaxRowsPerTable.ToString("N0") rows loaded
+        </div>
+    </div>
+
+    @if (Table.Rows.Count == 0)
+    {
+        <div class="empty-table">
+            <div class="empty-icon">∅</div>
+            <h2>No rows</h2>
+            <p>This table exists, but currently contains no data.</p>
+        </div>
+    }
+    else
+    {
+        <div class="grid-container">
+            <table class="data-grid">
+                <thead>
+                    <tr>
+                        <th class="row-number-header">#</th>
+
+                        @foreach (var column in Table.Columns)
+                        {
+                            <th>
+                                <div class="header-content">
+                                    <span>@column.Name</span>
+                                    <small>@column.DataType</small>
+                                </div>
+                            </th>
+                        }
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @{
+                        var rowNumber = 0;
+                    }
+
+                    @foreach (var row in FilteredRows)
+                    {
+                        rowNumber++;
+
+                        <tr>
+                            <td class="row-number">@rowNumber</td>
+
+                            @foreach (var column in Table.Columns)
+                            {
+                                var value = row.GetValue(column.Name);
+
+                                <td>
+                                    @if (value is null)
+                                    {
+                                        <span class="null-value">NULL</span>
+                                    }
+                                    else if (value is byte[] bytes)
+                                    {
+                                        <span class="blob-value">
+                                            BLOB · @bytes.Length bytes
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="cell-value">
+                                            @FormatValue(value)
+                                        </span>
+                                    }
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+    <div class="viewer-footer">
+        <span class="readonly-badge">READ ONLY</span>
+        <span>Changes are not written in this version.</span>
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public DatabaseTable Table { get; set; } = null!;
+
+    [Parameter]
+    public EventCallback OnReload { get; set; }
+
+    private string _search = string.Empty;
+
+    private List<DatabaseRow> FilteredRows =>
+        string.IsNullOrWhiteSpace(_search)
+            ? Table.Rows
+            : Table.Rows
+                .Where(row => row.Values.Values.Any(value =>
+                    value?.ToString()?.Contains(
+                        _search,
+                        StringComparison.OrdinalIgnoreCase) == true))
+                .ToList();
+
+    private static string FormatValue(object value)
+    {
+        return value switch
+        {
+            double d => d.ToString("G17", CultureInfo.InvariantCulture),
+            float f => f.ToString("G9", CultureInfo.InvariantCulture),
+            DateTime dt => dt.ToString("O", CultureInfo.InvariantCulture),
+            _ => value.ToString() ?? string.Empty
+        };
+    }
+
+    private async Task ReloadAsync()
+    {
+        await OnReload.InvokeAsync();
+    }
+}

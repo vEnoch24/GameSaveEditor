@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="456" height="456" viewBox="0 0 456 456" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <!-- Modern Gradient Blue Background -->
+    <defs>
+        <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#0d47a1;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#002171;stop-opacity:1" />
+        </linearGradient>
+    </defs>
+    
+    <!-- Background Canvas -->
+    <rect width="456" height="456" rx="40" ry="40" fill="url(#blueGrad)" />
+
+    <!-- Group for Text Elements to ensure perfect centering -->
+    <g transform="translate(0, 0)">
+        <!-- The Letter 'D' -->
+        <path d="M 110,130 
+                 H 190 
+                 c 45,0 80,30 80,98 
+                 0,68 -35,98 -80,98 
+                 H 110 
+                 Z 
+                 m 42,40 
+                 v 116 
+                 h 35 
+                 c 22,0 40,-15 40,-58 
+                 0,-43 -18,-58 -40,-58 
+                 Z"
+          fill="#ffffff" />
+              
+        <!-- The Letter 'B' -->
+        <path d="M 265,130 
+                 h 65 
+                 c 25,0 45,15 45,43 
+                 0,20 -12,33 -28,38 
+                 22,5 33,20 33,45 
+                 0,32 -25,44 -52,44 
+                 h -63 
+                 Z 
+                 m 42,36 
+                 v 40 
+                 h 20 
+                 c 12,0 20,-6 20,-20 
+                 0,-14 -8,-20 -20,-20 
+                 Z 
+                 m 0,72 
+                 v 44 
+                 h 24 
+                 c 14,0 22,-6 22,-22 
+                 0,-16 -8,-22 -22,-22 
+                 Z"
+          fill="#ffffff" />
+              
+        <!-- Modern Aesthetic Accent (Diagonal Dynamic Slash) -->
+        <path d="M 85,345 L 375,110" stroke="#00e5ff" stroke-width="6" stroke-linecap="round" opacity="0.8" />
+    </g>
+</svg>
