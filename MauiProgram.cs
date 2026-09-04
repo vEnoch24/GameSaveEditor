@@ -20,6 +20,7 @@ namespace GameSaveEditor
             builder.Services.AddMauiBlazorWebView();
             builder.Services.AddSingleton<MemoryService>();
             builder.Services.AddSingleton<DatabaseService>();
+            builder.Services.AddSingleton<BackupService>();
 
 #if DEBUG
             builder.Services.AddBlazorWebViewDeveloperTools();

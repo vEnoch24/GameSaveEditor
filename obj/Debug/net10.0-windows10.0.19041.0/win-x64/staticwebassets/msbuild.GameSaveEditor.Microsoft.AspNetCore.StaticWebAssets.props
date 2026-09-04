@@ -12,12 +12,12 @@
       <RelatedAsset></RelatedAsset>
       <AssetTraitName></AssetTraitName>
       <AssetTraitValue></AssetTraitValue>
-      <Fingerprint>1nwij2phqh</Fingerprint>
-      <Integrity>vYBikhVsEutRSlxIEWi8CeE7aXewzmYThO698FbJbGo=</Integrity>
+      <Fingerprint>1u4sqqdrtb</Fingerprint>
+      <Integrity>eZlwhgb6yGVYIF1ki09Gjz+IJMykTFlDSiwMkXIQLUw=</Integrity>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-      <FileLength>14554</FileLength>
-      <LastWriteTime>Fri, 04 Sep 2026 12:21:19 GMT</LastWriteTime>
+      <FileLength>18181</FileLength>
+      <LastWriteTime>Fri, 04 Sep 2026 17:53:19 GMT</LastWriteTime>
       <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\app.css'))</OriginalItemSpec>
     </StaticWebAsset>
     <StaticWebAsset Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\GameSaveEditor.styles.css'))">
@@ -52,12 +52,12 @@
       <RelatedAsset></RelatedAsset>
       <AssetTraitName></AssetTraitName>
       <AssetTraitValue></AssetTraitValue>
-      <Fingerprint>h57ydxngmg</Fingerprint>
-      <Integrity>tRmJ5Wv/tIkOKOEGCEnzc8WbHhTP7vJcH6Om8QGmlYI=</Integrity>
+      <Fingerprint>9d48z9et44</Fingerprint>
+      <Integrity>41AVK12kiXaET27iqIye6BGuid2VPpB1Pnj1u1F51KU=</Integrity>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-      <FileLength>888</FileLength>
-      <LastWriteTime>Thu, 03 Sep 2026 21:35:29 GMT</LastWriteTime>
+      <FileLength>963</FileLength>
+      <LastWriteTime>Fri, 04 Sep 2026 17:18:52 GMT</LastWriteTime>
       <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\index.html'))</OriginalItemSpec>
     </StaticWebAsset>
     <StaticWebAsset Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\lib\bootstrap\dist\css\bootstrap.min.css'))">

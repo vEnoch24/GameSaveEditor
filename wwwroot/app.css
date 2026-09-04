@@ -212,8 +212,11 @@ button {
 }
 
 .database-name {
-    font-size: 12px;
-    font-weight: 700;
+    font-size: 14px;
+    font-weight: 900;
+    color: aliceblue;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .database-path {
@@ -781,3 +784,202 @@ button {
         float: right;
         cursor: pointer;
     }
+
+.success-banner {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 8px 18px;
+    border-bottom: 1px solid rgba(52,211,153,.18);
+    color: #a7f3d0;
+    background: rgba(6,78,59,.18);
+    font-size: 11px
+}
+
+    .success-banner > span {
+        color: var(--success);
+        font-weight: 800
+    }
+
+.warning-inline {
+    color: #fbbf24
+}
+
+.table-actions {
+    display: flex;
+    gap: 8px
+}
+
+.editable-cell {
+    cursor: text
+}
+
+    .editable-cell:hover {
+        box-shadow: inset 0 0 0 1px rgba(79,140,255,.16)
+    }
+
+.cell-editor {
+    width: min(500px,40vw);
+    min-width: 100px;
+    height: 28px;
+    padding: 0 7px;
+    outline: none;
+    border: 1px solid rgba(79,140,255,.65);
+    border-radius: 5px;
+    color: var(--text);
+    background: #0a1220;
+    font-size: 11px
+}
+
+.delete-button {
+    padding: 5px 8px;
+    border-radius: 5px;
+    color: #fda4af;
+    background: rgba(244,63,94,.07);
+    font-size: 9px;
+    cursor: pointer
+}
+
+    .delete-button:hover {
+        background: rgba(244,63,94,.15)
+    }
+
+.editable-badge {
+    padding: 3px 6px;
+    border-radius: 4px;
+    color: #86efac;
+    background: rgba(34,197,94,.08);
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: .05em
+}
+
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background: rgba(2,6,23,.70);
+    backdrop-filter: blur(5px)
+}
+
+.modal-card {
+    width: min(470px,94vw);
+    max-height: 86vh;
+    overflow: auto;
+    padding: 20px;
+    border: 1px solid var(--border);
+    border-radius: 13px;
+    background: #0e1727;
+    box-shadow: 0 24px 80px rgba(0,0,0,.55)
+}
+
+.insert-modal {
+    width: min(620px,94vw)
+}
+
+.modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between
+}
+
+    .modal-header h2 {
+        margin: 0;
+        font-size: 18px
+    }
+
+.modal-description {
+    margin: 13px 0 18px;
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.6
+}
+
+.field-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0 0 6px;
+    color: #aebbd0;
+    font-size: 10px;
+    font-weight: 700
+}
+
+    .field-label span {
+        color: var(--muted-2);
+        font-weight: 500
+    }
+
+.text-input {
+    width: 100%;
+    height: 36px;
+    padding: 0 10px;
+    outline: none;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    color: var(--text);
+    background: #0a1220;
+    font-size: 11px
+}
+
+    .text-input:focus {
+        border-color: rgba(79,140,255,.6)
+    }
+
+.checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 13px;
+    color: var(--muted);
+    font-size: 10px
+}
+
+    .checkbox-row input {
+        accent-color: #4f8cff
+    }
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 20px
+}
+
+.btn-danger {
+    color: #ffe4e6;
+    background: #9f2944
+}
+
+    .btn-danger:hover {
+        background: #b32d4d
+    }
+
+.insert-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 13px
+}
+
+.field-group {
+    min-width: 0
+}
+
+@media(max-width:900px) {
+    .sidebar {
+        width: 240px;
+        min-width: 240px
+    }
+
+    .table-view {
+        padding: 18px
+    }
+
+    .insert-form {
+        grid-template-columns: 1fr
+    }
+}

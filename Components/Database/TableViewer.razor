@@ -1,176 +1,108 @@
 ﻿@using System.Globalization
+@using Microsoft.AspNetCore.Components.Web
 
 <div class="table-view">
-    <div class="table-header">
-        <div>
-            <div class="eyebrow">TABLE</div>
-            <h1>@Table.Name</h1>
-            <div class="table-summary">
-                @Table.Columns.Count columns
-                <span>•</span>
-                @Table.RowCount.ToString("N0") rows
-            </div>
-        </div>
+    <div class="table-header"><div><div class="eyebrow">TABLE</div><h1>@Table.Name</h1><div class="table-summary">@Table.Columns.Count columns <span>•</span> @Table.RowCount.ToString("N0") rows @if(!Table.HasRowId){
+        <><span>•</span><span class="warning-inline">No rowid: editing disabled</span></>
+    }
+</div></div><div class="table-actions"><button class="btn btn-secondary" @onclick="ReloadAsync">↻ Refresh</button>@if(Table.HasRowId){
+<button class="btn btn-primary" @onclick="ShowInsertDialog">＋ Add row</button>
+}
+</div></div>
+<div class="schema-strip">@foreach(var c in Table.Columns){
+    <div class="column-chip"><span class="column-name">@c.Name</span><span class="column-type">@c.DataType</span>@if(c.IsPrimaryKey){
+        <span class="pk-badge">PK</span>
+    }
+    @if (c.IsNotNull)
+    {
+        <span class="required-badge">NOT NULL</span>
+    }
+</div>
+}
+</div>
+<div class="toolbar"><div class="search-box"><span class="search-icon">⌕</span><input placeholder="Search loaded rows..." @bind="_search" @bind:event="oninput" /></div><div class="toolbar-info">@FilteredRows.Count.ToString("N0") visible <span>•</span> double-click a cell to edit</div></div>
+@if (Table.Rows.Count == 0)
+{
+    <div class="empty-table"><div class="empty-icon">∅</div><h2>No rows</h2><p>This table currently contains no data.</p></div>
+}
+else
+{
 
-        <div class="table-actions">
-            <button class="btn btn-secondary" @onclick="ReloadAsync">
-                ↻ Refresh
-            </button>
-        </div>
-    </div>
-
-    <div class="schema-strip">
-        @foreach (var column in Table.Columns)
+    <div class="grid-container"><table class="data-grid"><thead><tr><th class="row-number-header">#</th>@foreach(var c in Table.Columns){
+        <th><div class="header-content"><span>@c.Name</span><small>@c.DataType</small></div></th>
+    }
+    @if (Table.HasRowId)
+    {
+        <th>ACTION</th>
+    }
+</tr></thead><tbody>@{
+var n = 0;
+}
+@foreach (var row in FilteredRows)
+{
+    n++;
+    <tr><td class="row-number">@n</td>@foreach(var c in Table.Columns){var value=row.GetValue(c.Name);
+        <td class="editable-cell" @ondblclick="() => BeginEdit(row, c)">@if(_editingRow==row&&_editingColumn==c){
+            <input class="cell-editor" @bind="_editText" @bind:event="oninput" @onkeydown="e => HandleEditKeyDown(e, row, c)" @onblur="() => CommitEditAsync(row, c)" />
+        }else if (value is null)
         {
-            <div class="column-chip">
-                <span class="column-name">@column.Name</span>
-                <span class="column-type">@column.DataType</span>
 
-                @if (column.IsPrimaryKey)
-                {
-                    <span class="pk-badge">PK</span>
-                }
-
-                @if (column.IsNotNull)
-                {
-                    <span class="required-badge">NOT NULL</span>
-                }
-            </div>
+            <span class="null-value">NULL</span>
         }
-    </div>
+        else if (value is byte[] b)
+        {
 
-    <div class="toolbar">
-        <div class="search-box">
-            <span class="search-icon">⌕</span>
+            <span class="blob-value">BLOB · @b.Length bytes</span>
+        }
+        else
+        {
 
-            <input placeholder="Search loaded rows..."
-                   @bind="_search"
-                   @bind:event="oninput" />
-
-            @if (!string.IsNullOrEmpty(_search))
-            {
-                <button class="clear-search"
-                        @onclick="() => _search = string.Empty">
-                    ×
-                </button>
-            }
-        </div>
-
-        <div class="toolbar-info">
-            @FilteredRows.Count.ToString("N0") visible
-            <span>•</span>
-            first @DatabaseConfiguration.MaxRowsPerTable.ToString("N0") rows loaded
-        </div>
-    </div>
-
-    @if (Table.Rows.Count == 0)
-    {
-        <div class="empty-table">
-            <div class="empty-icon">∅</div>
-            <h2>No rows</h2>
-            <p>This table exists, but currently contains no data.</p>
-        </div>
-    }
-    else
-    {
-        <div class="grid-container">
-            <table class="data-grid">
-                <thead>
-                    <tr>
-                        <th class="row-number-header">#</th>
-
-                        @foreach (var column in Table.Columns)
-                        {
-                            <th>
-                                <div class="header-content">
-                                    <span>@column.Name</span>
-                                    <small>@column.DataType</small>
-                                </div>
-                            </th>
-                        }
-                    </tr>
-                </thead>
-
-                <tbody>
-                    @{
-                        var rowNumber = 0;
-                    }
-
-                    @foreach (var row in FilteredRows)
-                    {
-                        rowNumber++;
-
-                        <tr>
-                            <td class="row-number">@rowNumber</td>
-
-                            @foreach (var column in Table.Columns)
-                            {
-                                var value = row.GetValue(column.Name);
-
-                                <td>
-                                    @if (value is null)
-                                    {
-                                        <span class="null-value">NULL</span>
-                                    }
-                                    else if (value is byte[] bytes)
-                                    {
-                                        <span class="blob-value">
-                                            BLOB · @bytes.Length bytes
-                                        </span>
-                                    }
-                                    else
-                                    {
-                                        <span class="cell-value">
-                                            @FormatValue(value)
-                                        </span>
-                                    }
-                                </td>
-                            }
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    }
-
-    <div class="viewer-footer">
-        <span class="readonly-badge">READ ONLY</span>
-        <span>Changes are not written in this version.</span>
-    </div>
+            <span class="cell-value">@FormatValue(value)</span>
+        }
+    </td>
+}
+@if (Table.HasRowId)
+{
+    <td><button class="delete-button" @onclick="() => ConfirmDeleteAsync(row)">Delete</button></td>
+}
+</tr>
+}
+</tbody></table></div>
+}
+<div class="viewer-footer"><span class="editable-badge">EDITABLE</span><span>Every write creates a timestamped backup beside the database first.</span></div>
 </div>
 
+@if (_showDelete && _deleteRow is not null)
+{
+    <div class="modal-backdrop"><div class="modal-card"><div class="modal-header"><div><div class="eyebrow">DELETE ROW</div><h2>Delete this row?</h2></div><button class="icon-button" @onclick="CancelDelete">×</button></div><p class="modal-description">A backup of the database will be created before deletion.</p><div class="modal-actions"><button class="btn btn-secondary" @onclick="CancelDelete">Cancel</button><button class="btn btn-danger" @onclick="DeleteConfirmedAsync">Delete row</button></div></div></div>
+}
+@if (_showInsert)
+{
+    <div class="modal-backdrop"><div class="modal-card insert-modal"><div class="modal-header"><div><div class="eyebrow">INSERT ROW</div><h2>New row</h2></div><button class="icon-button" @onclick="CancelInsert">×</button></div><div class="insert-form">@foreach(var c in Table.Columns){
+        <div class="field-group"><label class="field-label">@c.Name <span>@c.DataType</span></label><input class="text-input" placeholder="NULL" @bind="_insert[c.Name]" @bind:event="oninput" /></div>
+    }
+</div><div class="modal-actions"><button class="btn btn-secondary" @onclick="CancelInsert">Cancel</button><button class="btn btn-primary" @onclick="InsertAsync">Insert row</button></div></div></div>
+}
+
 @code {
-    [Parameter, EditorRequired]
-    public DatabaseTable Table { get; set; } = null!;
-
-    [Parameter]
-    public EventCallback OnReload { get; set; }
-
-    private string _search = string.Empty;
-
-    private List<DatabaseRow> FilteredRows =>
-        string.IsNullOrWhiteSpace(_search)
-            ? Table.Rows
-            : Table.Rows
-                .Where(row => row.Values.Values.Any(value =>
-                    value?.ToString()?.Contains(
-                        _search,
-                        StringComparison.OrdinalIgnoreCase) == true))
-                .ToList();
-
-    private static string FormatValue(object value)
-    {
-        return value switch
-        {
-            double d => d.ToString("G17", CultureInfo.InvariantCulture),
-            float f => f.ToString("G9", CultureInfo.InvariantCulture),
-            DateTime dt => dt.ToString("O", CultureInfo.InvariantCulture),
-            _ => value.ToString() ?? string.Empty
-        };
-    }
-
-    private async Task ReloadAsync()
-    {
-        await OnReload.InvokeAsync();
-    }
+    [Parameter, EditorRequired] public DatabaseTable Table { get; set; } = null!;
+    [Parameter, EditorRequired] public DatabaseService Database { get; set; } = null!;
+    [Parameter, EditorRequired] public BackupService BackupService { get; set; } = null!;
+    [Parameter] public EventCallback<string> OnError { get; set; }
+    [Parameter] public EventCallback<string> OnMessage { get; set; }
+    private string _search = ""; private DatabaseRow? _editingRow; private DatabaseColumn? _editingColumn; private string _editText = ""; private bool _showDelete; private DatabaseRow? _deleteRow; private bool _showInsert; private readonly Dictionary<string, string> _insert = new(StringComparer.OrdinalIgnoreCase);
+    private List<DatabaseRow> FilteredRows => string.IsNullOrWhiteSpace(_search) ? Table.Rows : Table.Rows.Where(r => r.Values.Values.Any(v => v?.ToString()?.Contains(_search, StringComparison.OrdinalIgnoreCase) == true)).ToList();
+    private void BeginEdit(DatabaseRow r, DatabaseColumn c) { _editingRow = r; _editingColumn = c; var v = r.GetValue(c.Name); _editText = v is byte[] b ? Convert.ToBase64String(b) : v?.ToString() ?? ""; }
+    private async Task HandleEditKeyDown(KeyboardEventArgs e, DatabaseRow r, DatabaseColumn c) { if (e.Key == "Enter") await CommitEditAsync(r, c); else if (e.Key == "Escape") CancelEdit(); }
+    private async Task CommitEditAsync(DatabaseRow r, DatabaseColumn c) { if (_editingRow != r || _editingColumn != c) return; var old = r.GetValue(c.Name); if (_editText == (old?.ToString() ?? "")) { CancelEdit(); return; } try { var backup = await BackupService.CreateBackupAsync(Database.DatabasePath); await Database.UpdateCellAsync(Table, r, c, ConvertFromText(_editText, c, old)); CancelEdit(); await OnMessage.InvokeAsync($"Saved. Backup created: {Path.GetFileName(backup)}"); } catch (Exception ex) { CancelEdit(); await OnError.InvokeAsync(ex.Message); } }
+    private void CancelEdit() { _editingRow = null; _editingColumn = null; _editText = ""; }
+    private Task ReloadAsync() => Database.ReloadAsync();
+    private Task ConfirmDeleteAsync(DatabaseRow r) { _deleteRow = r; _showDelete = true; return Task.CompletedTask; }
+    private void CancelDelete() { _deleteRow = null; _showDelete = false; }
+    private async Task DeleteConfirmedAsync() { if (_deleteRow is null) return; try { var backup = await BackupService.CreateBackupAsync(Database.DatabasePath); await Database.DeleteRowAsync(Table, _deleteRow); CancelDelete(); await OnMessage.InvokeAsync($"Row deleted. Backup created: {Path.GetFileName(backup)}"); } catch (Exception ex) { CancelDelete(); await OnError.InvokeAsync(ex.Message); } }
+    private void ShowInsertDialog() { _insert.Clear(); foreach (var c in Table.Columns) _insert[c.Name] = ""; _showInsert = true; }
+    private void CancelInsert() { _showInsert = false; _insert.Clear(); }
+    private async Task InsertAsync() { try { var values = new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase); foreach (var c in Table.Columns) { var text = _insert.GetValueOrDefault(c.Name, ""); if (c.IsPrimaryKey && c.DataType.Contains("INT", StringComparison.OrdinalIgnoreCase) && string.IsNullOrWhiteSpace(text)) continue; values[c.Name] = ConvertFromText(text, c, null); } var backup = await BackupService.CreateBackupAsync(Database.DatabasePath); await Database.InsertRowAsync(Table, values); CancelInsert(); await OnMessage.InvokeAsync($"Row inserted. Backup created: {Path.GetFileName(backup)}"); } catch (Exception ex) { await OnError.InvokeAsync(ex.Message); } }
+    private static object? ConvertFromText(string text, DatabaseColumn c, object? existing) { if (string.IsNullOrWhiteSpace(text)) return null; if (existing is byte[]) { try { return Convert.FromBase64String(text); } catch { throw new FormatException($"'{c.Name}' expects Base64 BLOB data."); } } var t = c.DataType.ToUpperInvariant(); if (t.Contains("INT")) { if (long.TryParse(text, NumberStyles.Integer, CultureInfo.InvariantCulture, out var i)) return i; throw new FormatException($"'{c.Name}' expects an integer."); } if (t.Contains("REAL") || t.Contains("FLOA") || t.Contains("DOUB")) { if (double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out var d)) return d; throw new FormatException($"'{c.Name}' expects a number."); } return text; }
+    private static string FormatValue(object v) => v switch { double d => d.ToString("G17", CultureInfo.InvariantCulture), float f => f.ToString("G9", CultureInfo.InvariantCulture), DateTime dt => dt.ToString("O", CultureInfo.InvariantCulture), _ => v.ToString() ?? "" };
 }

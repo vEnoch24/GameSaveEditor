@@ -1,261 +1,182 @@
 ﻿@page "/"
-
 @inject DatabaseService Database
-
+@inject BackupService BackupService
 <PageTitle>Save Database Explorer</PageTitle>
-
 <div class="page">
     <header class="topbar">
-        <div class="brand">
-            <div class="brand-mark">DB</div>
-            <div>
-                <div class="brand-title">Save Database Explorer</div>
-                <div class="brand-subtitle">SQLCipher / SQLite save viewer</div>
+        <div class="brand"><div class="brand-mark">DB</div><div><div class="brand-title">Save Database Explorer</div><div class="brand-subtitle">SQLite / SQLCipher database editor</div></div></div><div class="top-actions">
+        @if (Database.IsOpen)
+        {
+            <div class="connection-pill"><span class="status-dot"></span>@(Database.IsEncryptedConnection ? "Encrypted · Editable" : "SQLite · Editable")</div>
+        }
+        <button class="btn btn-secondary" @onclick="OpenDatabaseAsync">Open database</button>
+    </div>
+</header>
+@if (_message is not null)
+{
+    <div class="success-banner"><span>✓</span>@_message<button class="icon-button" @onclick="() => _message = null">×</button></div>
+}
+@if (_error is not null)
+{
+    <div class="error-banner"><div><strong>Database operation failed</strong><span>@_error</span></div><button class="icon-button" @onclick="() => _error = null">×</button></div>
+}
+<main class="workspace">
+    <aside class="sidebar">
+        <div class="sidebar-section"><div class="section-label">DATABASE</div>
+            <div class="database-card">
+
+                <div class="database-icon">▣</div>
+                <div class="database-meta">
+                    <div class="database-name">@(_databaseName ?? "No database")</div>
+                    <div class="database-path" title="@Database.DatabasePath">@(Database.IsOpen ? Database.DatabasePath : "Open a .db file to begin")</div></div>
+            </div></div><div class="sidebar-section tables-section">
+            <div class="section-heading">
+                <div class="section-label">TABLES</div>@if(Database.IsOpen){
+                                                           <span class="table-count">@Database.Tables.Count</span>
+                                                       }
+            </div>@if(!Database.IsOpen){
+                      <div class="empty-sidebar">Open a database to view its tables.</div>
+                  }else
+                  {
+
+                      <div class="table-list">
+                          @foreach (var t in Database.Tables)
+                          {
+                              <button class="table-item @(Database.SelectedTable?.Name == t.Name ? "selected" : "")" @onclick="() => SelectTableAsync(t)">
+                                  <span class="table-symbol">▦</span><span class="table-item-name">@t.Name</span><span class="row-count">@t.RowCount.ToString("N0")</span>
+                              </button>
+                          }
+                      </div>
+                  }
+        </div>
+        @if (Database.IsOpen)
+        {
+            <div class="sidebar-footer">
+                <button class="sidebar-action" @onclick="OpenDatabaseAsync"><span>＋</span> Open another database</button>
             </div>
-        </div>
-
-        <div class="top-actions">
-            @if (Database.IsOpen)
-            {
-                <div class="connection-pill">
-                    <span class="status-dot"></span>
-                    Connected
-                </div>
-            }
-            else
-            {
-                <div class="connection-pill offline">
-                    <span class="status-dot"></span>
-                    No database
-                </div>
-            }
-
-            @* <button class="btn btn-secondary" @onclick="OpenDatabaseAsync">
-                Open database
-            </button> *@
-        </div>
-    </header>
-
-    @if (!string.IsNullOrWhiteSpace(_error))
+        }
+</aside>
+<section class="content">
+    @if (!Database.IsOpen)
     {
-        <div class="error-banner">
-            <div>
-                <strong>Could not open database</strong>
-                <span>@_error</span>
-            </div>
-            <button class="icon-button" @onclick="() => _error = null">×</button>
-        </div>
+        <div class="welcome"><div class="welcome-icon">▤</div><h2>Explore and edit a save database</h2>
+            <p>Open an SQLite/SQLCipher database, inspect its tables, edit values, and save safely with an automatic backup.</p>
+            <button class="btn btn-primary btn-large" @onclick="OpenDatabaseAsync">Open database</button><div class="hint">Keys are supplied by the user. Unknown encryption keys are not recovered or cracked.</div></div>
     }
+    else if (Database.SelectedTable is null)
+    {
 
-    <main class="workspace">
-        <aside class="sidebar">
-            <div class="sidebar-section">
-                <div class="section-label">DATABASE</div>
+        <div class="welcome compact"><div class="welcome-icon">▦</div><h1>Select a table</h1><p>Choose a table from the left.</p></div>
+    }
+    else
+    {
 
-                <div class="database-card">
-                    <div class="database-icon">▣</div>
-                    <div class="database-meta">
-                        <div class="database-name">
-                            @(_databaseName ?? "No database")
-                        </div>
-                        <div class="database-path" title="@Database.DatabasePath">
-                            @(Database.IsOpen
-                                ? Database.DatabasePath
-                                : "Open a .db file to begin")
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="sidebar-section tables-section">
-                <div class="section-heading">
-                    <div class="section-label">TABLES</div>
-                    @if (Database.IsOpen)
-                    {
-                        <span class="table-count">@Database.Tables.Count</span>
-                    }
-                </div>
-
-                @if (!Database.IsOpen)
-                {
-                    <div class="empty-sidebar">
-                        <div class="empty-icon">◌</div>
-                        <div>Open a database to view its tables.</div>
-                    </div>
-                }
-                else if (Database.Tables.Count == 0)
-                {
-                    <div class="empty-sidebar">
-                        No user tables found.
-                    </div>
-                }
-                else
-                {
-                    <div class="table-list">
-                        @foreach (var table in Database.Tables)
-                        {
-                            <button class="table-item @(Database.SelectedTable?.Name == table.Name ? "selected" : "")"
-                                    @onclick="() => SelectTableAsync(table)">
-                                <span class="table-symbol">▦</span>
-                                <span class="table-item-name">@table.Name</span>
-                                <span class="row-count">@table.RowCount.ToString("N0")</span>
-                            </button>
-                        }
-                    </div>
-                }
-            </div>
-
-             @if (Database.IsOpen)
-            {
-                <div class="sidebar-footer">
-                    <button class="sidebar-action" @onclick="OpenDatabaseAsync">
-                        <span>＋</span>
-                        Open another database
-                    </button>
-                </div>
-            }
-            
-        </aside>
-
-        <section class="content">
-            @if (!Database.IsOpen)
-            {
-                <div class="welcome">
-                    <div class="welcome-icon">▤</div>
-                    <h2>Explore your save database</h2>
-                    <p>
-                        Open your encrypted <strong>.db</strong> and browse
-                        its schema and table contents without modifying the save.
-                    </p>
-                    <button class="btn btn-primary btn-large"
-                            @onclick="OpenDatabaseAsync">
-                        Open .db file
-                    </button>
-                    <div class="hint">
-                        The configured SQLCipher passphrase is applied automatically.
-                    </div>
-                </div>
-            }
-            else if (Database.SelectedTable is null)
-            {
-                <div class="welcome compact">
-                    <div class="welcome-icon">▦</div>
-                    <h1>Select a table</h1>
-                    <p>Choose a table from the left to inspect its columns and data.</p>
-                </div>
-            }
-            else
-            {
-                <TableViewer Table="Database.SelectedTable"
-                             OnReload="ReloadSelectedTableAsync" />
-            }
-        </section>
-    </main>
+        <TableViewer Table="Database.SelectedTable" Database="Database" BackupService="BackupService" OnError="SetError" OnMessage="SetMessage" />
+    }
+</section>
+</main>
+@if (_showKeyDialog)
+{
+    <div class="modal-backdrop"><div class="modal-card key-modal"><div class="modal-header"><div><div class="eyebrow">OPEN DATABASE</div><h2>Encryption key</h2></div><button class="icon-button" @onclick="CancelKeyDialog">×</button></div><p class="modal-description">Enter the database passphrase. It is used directly as the SQLCipher passphrase.</p><label class="field-label">Key / passphrase</label><input class="text-input" type="password" autocomplete="off" @bind="_pendingKey" @bind:event="oninput" @onkeydown="HandleKeyDown" /><label class="checkbox-row"><input type="checkbox" @bind="_rememberKey" /><span>Remember for this session only</span></label><div class="modal-actions"><button class="btn btn-secondary" @onclick="CancelKeyDialog">Cancel</button><button class="btn btn-primary" @onclick="OpenPendingDatabaseAsync">Open</button></div></div></div>
+}
 </div>
-
 @code {
-    private string? _error;
-    private string? _databaseName;
-
-    protected override async Task OnInitializedAsync()
+    private string? _error, _message, _databaseName;
+    private bool _showKeyDialog, _rememberKey;
+    private string _pendingPath = "", _pendingKey = "";
+    private string? _sessionKey; protected override async Task OnInitializedAsync()
     {
-        await TryOpenDefaultDatabaseAsync();
-    }
-
-    private async Task TryOpenDefaultDatabaseAsync()
-    {
-        try
-        {
-            if (File.Exists(DatabaseConfiguration.DefaultDatabasePath))
+        if (File.Exists(DatabaseConfiguration.DefaultDatabasePath))
+            try
             {
-                await Database.OpenAsync(DatabaseConfiguration.DefaultDatabasePath);
+                await Database.OpenAsync(DatabaseConfiguration.DefaultDatabasePath, DatabaseConfiguration.DefaultEncryptionKey);
                 _databaseName = Path.GetFileName(Database.DatabasePath);
+                _sessionKey = DatabaseConfiguration.DefaultEncryptionKey;
             }
-        }
-        catch (Exception ex)
-        {
-            _error = ToUserMessage(ex);
-        }
+            catch (Exception ex) { _error = ToUserMessage(ex); }
     }
-
     private async Task OpenDatabaseAsync()
     {
         _error = null;
-
+        _message = null;
         try
         {
-            var result = await FilePicker.Default.PickAsync(new PickOptions
-            {
-                PickerTitle = "Select an encrypted SQLite database",
-                FileTypes = new FilePickerFileType(
-                    new Dictionary<DevicePlatform, IEnumerable<string>>
-                    {
-                        [DevicePlatform.WinUI] =
-                            new[] { ".db", ".sqlite", ".sqlite3" }
-                    })
-            });
-
-            if (result is null)
+            var r = await FilePicker.Default.PickAsync(new PickOptions { PickerTitle = "Select SQLite / SQLCipher database", FileTypes = new FilePickerFileType(new Dictionary<DevicePlatform, IEnumerable<string>> { [DevicePlatform.WinUI] = new[] { ".db", ".sqlite", ".sqlite3" } }) });
+            if (r is null)
                 return;
-
-            var localPath = await CopyToLocalPathAsync(result);
-
-            await Database.OpenAsync(localPath);
-            _databaseName = Path.GetFileName(localPath);
+            var path = await CopyToLocalPathAsync(r);
+            try
+            {
+                await Database.OpenAsync(path, null);
+                _databaseName = Path.GetFileName(path);
+                _sessionKey = null;
+                return;
+            }
+            catch { }
+            _pendingPath = path;
+            _pendingKey = _sessionKey ?? "";
+            _rememberKey = !string.IsNullOrEmpty(_sessionKey);
+            _showKeyDialog = true;
         }
-        catch (Exception ex)
+        catch (Exception ex) { _error = ToUserMessage(ex); }
+    }
+    private async Task OpenPendingDatabaseAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_pendingKey))
         {
-            _error = ToUserMessage(ex);
+            _error = "Enter a key/passphrase.";
+            return;
         }
-    }
-
-    private static async Task<string> CopyToLocalPathAsync(FileResult result)
-    {
-        if (!string.IsNullOrWhiteSpace(result.FullPath) &&
-            File.Exists(result.FullPath))
-        {
-            return result.FullPath;
-        }
-
-        var destination = Path.Combine(
-            FileSystem.CacheDirectory,
-            $"{Guid.NewGuid():N}_{result.FileName}");
-
-        await using var source = await result.OpenReadAsync();
-        await using var destinationStream = File.Create(destination);
-
-        await source.CopyToAsync(destinationStream);
-
-        return destination;
-    }
-
-    private async Task SelectTableAsync(DatabaseTable table)
-    {
-        _error = null;
-        await Database.SelectTableAsync(table);
-    }
-
-    private async Task ReloadSelectedTableAsync()
-    {
-        _error = null;
-
         try
         {
-            await Database.ReloadAsync();
+            await Database.OpenAsync(_pendingPath, _pendingKey);
+            _databaseName = Path.GetFileName(_pendingPath);
+            _sessionKey = _rememberKey ? _pendingKey : null;
+            _showKeyDialog = false;
         }
-        catch (Exception ex)
-        {
-            _error = ToUserMessage(ex);
-        }
+        catch (Exception ex) { _error = ToUserMessage(ex); }
     }
-
-    private static string ToUserMessage(Exception ex)
+    private void CancelKeyDialog()
     {
-        if (ex is Microsoft.Data.Sqlite.SqliteException)
-        {
-            return "SQLite could not read the database. Verify that the SQLCipher key and cipher configuration match the save file.";
-        }
-
-        return ex.Message;
+        _showKeyDialog = false;
+        _pendingKey = "";
+        _pendingPath = "";
     }
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+            await OpenPendingDatabaseAsync();
+    }
+    private async Task SelectTableAsync(DatabaseTable t)
+    {
+        try
+        {
+            _error = null;
+            await Database.SelectTableAsync(t);
+        }
+        catch (Exception ex) { _error = ToUserMessage(ex); }
+    }
+    private void SetError(string m)
+    {
+        _error = m;
+        _message = null;
+        InvokeAsync(StateHasChanged);
+    }
+    private void SetMessage(string m)
+    {
+        _message = m;
+        _error = null;
+        InvokeAsync(StateHasChanged);
+    }
+    private static async Task<string> CopyToLocalPathAsync(FileResult r)
+    {
+        if (!string.IsNullOrWhiteSpace(r.FullPath) && File.Exists(r.FullPath))
+            return r.FullPath;
+        var d = Path.Combine(FileSystem.CacheDirectory, $"{Guid.NewGuid():N}_{r.FileName}");
+        await using var s = await r.OpenReadAsync();
+        await using var o = File.Create(d);
+        await s.CopyToAsync(o);
+        return d;
+    }
+    private static string ToUserMessage(Exception ex) => ex is Microsoft.Data.Sqlite.SqliteException ? "SQLite could not read the database with the supplied key/settings. Verify the key and encryption format." : ex.Message;
 }
