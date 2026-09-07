@@ -1,0 +1,78 @@
+﻿@using GameSaveEditor.Services
+
+<div class="backup-manager">
+    <div class="manager-toolbar"><div><div class="eyebrow">BACKUP MANAGER</div><h2>Database backups</h2><p class="manager-subtitle">Backups are stored separately from the source database.</p></div><button class="btn btn-secondary" @onclick="LoadAsync">↻ Refresh</button></div>
+    <div class="backup-location"><span>BACKUP FOLDER</span><code>@BackupService.BackupDirectory</code></div>
+    @if (Backups.Count == 0)
+    {
+        <div class="empty-manager">No backups have been created yet.</div>
+    }
+    else
+    {
+
+        <div class="backup-list">@foreach(var backup in Backups){
+            <div class="backup-item"><div><strong>@backup.FileName</strong><span>@FormatSize(backup.SizeBytes) · @backup.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")</span></div><div class="backup-actions"><button class="btn btn-secondary" @onclick="() => RestoreAsync(backup)">Restore</button><button class="delete-button" @onclick="() => DeleteAsync(backup)">Delete</button></div></div>
+        }
+    </div>
+}
+</div>
+@if (_confirmRestore is not null)
+{
+    <div class="modal-backdrop"><div class="modal-card"><div class="modal-header"><div><div class="eyebrow">RESTORE BACKUP</div><h2>Restore this backup?</h2></div><button class="icon-button" @onclick="() => _confirmRestore = null">×</button></div><p class="modal-description">The current database will be replaced. Close the database first, then restore the selected backup.</p><div class="modal-actions"><button class="btn btn-secondary" @onclick="() => _confirmRestore = null">Cancel</button><button class="btn btn-danger" @onclick="ConfirmRestoreAsync">Restore</button></div></div></div>
+}
+
+@code {
+    [Parameter, EditorRequired] public BackupService BackupService { get; set; } = null!;
+    [Parameter]
+    public string? DatabasePath
+    {
+        get; set;
+    }
+    [Parameter]
+    public EventCallback<string> OnRestore
+    {
+        get; set;
+    }
+    [Parameter]
+    public EventCallback<string> OnError
+    {
+        get; set;
+    }
+    private IReadOnlyList<BackupEntry> Backups = [];
+    private BackupEntry? _confirmRestore;
+    protected override void OnInitialized() => Load();
+    private void Load() => Backups = BackupService.ListBackups(DatabasePath);
+    private Task LoadAsync()
+    {
+        Load();
+        return InvokeAsync(StateHasChanged);
+    }
+    private async Task RestoreAsync(BackupEntry backup)
+    {
+        _confirmRestore = backup;
+        await InvokeAsync(StateHasChanged);
+    }
+    private async Task ConfirmRestoreAsync()
+    {
+        if (_confirmRestore is null || string.IsNullOrWhiteSpace(DatabasePath))
+            return;
+        var path = _confirmRestore.FullPath;
+        _confirmRestore = null;
+        try
+        {
+            await OnRestore.InvokeAsync(path);
+        }
+        catch (Exception ex) { await OnError.InvokeAsync(ex.Message); }
+    }
+    private async Task DeleteAsync(BackupEntry backup)
+    {
+        try
+        {
+            BackupService.DeleteBackup(backup.FullPath);
+            Load();
+            await InvokeAsync(StateHasChanged);
+        }
+        catch (Exception ex) { await OnError.InvokeAsync(ex.Message); }
+    }
+    private static string FormatSize(long bytes) => bytes switch { >= 1024 * 1024 => $"{bytes / 1024d / 1024d:0.0} MB", >= 1024 => $"{bytes / 1024d:0.0} KB", _ => $"{bytes} B" };
+}

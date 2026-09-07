@@ -9,4 +9,6 @@ public static class DatabaseConfiguration
         "eNYKHF1fzulUnlMLl9Adb8AN5Ar/P/UmD+7x3Rrc/v0=";
 
     public const int MaxRowsPerTable = 5000;
+
+    public const int MaxQueryRows = 5000;
 }

@@ -21,10 +21,14 @@ namespace GameSaveEditor
             builder.Services.AddSingleton<MemoryService>();
             builder.Services.AddSingleton<DatabaseService>();
             builder.Services.AddSingleton<BackupService>();
+            builder.Services.AddSingleton<AppSettingsService>();
+            builder.Services.AddSingleton<KeyVaultService>();
+            builder.Services.AddSingleton<ProfileService>();
+            builder.Services.AddSingleton<DatabaseProbeService>();
 
 #if DEBUG
             builder.Services.AddBlazorWebViewDeveloperTools();
-    		builder.Logging.AddDebug();
+            builder.Logging.AddDebug();
 #endif
 
             return builder.Build();

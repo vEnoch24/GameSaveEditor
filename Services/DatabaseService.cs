@@ -17,53 +17,64 @@ public sealed class DatabaseService : IDisposable
     {
         get; private set;
     }
+    public DatabaseProfile? ActiveProfile
+    {
+        get; private set;
+    }
     public ObservableCollection<DatabaseTable> Tables { get; } = [];
     public DatabaseTable? SelectedTable
     {
         get; private set;
     }
 
-    public async Task OpenAsync(string path, string? password, bool readOnly = false)
+    public async Task<bool> TestConnectionAsync(string path, string? password, DatabaseProfile? profile = null)
     {
         if (!File.Exists(path))
             throw new FileNotFoundException("The selected database file could not be found.", path);
+        profile ??= string.IsNullOrEmpty(password) ? DatabaseProfile.BuiltIns.First(x => x.Id == "plain") : DatabaseProfile.BuiltIns.First(x => x.Id == "sqlcipher4");
+        return profile.Id is "sqlcipher3" or "sqlcipher-custom"
+            ? throw new NotSupportedException($"The '{profile.Name}' profile is not supported by the bundled SQLCipher 4 provider.")
+            : await Task.Run(() =>
+        {
+            var builder = new SqliteConnectionStringBuilder { DataSource = path, Mode = SqliteOpenMode.ReadOnly, Cache = SqliteCacheMode.Private };
+            if (!string.IsNullOrEmpty(password))
+                builder.Password = password;
+            using var connection = new SqliteConnection(builder.ToString());
+            connection.Open();
+            using var command = connection.CreateCommand();
+            command.CommandText = "SELECT count(*) FROM sqlite_master;";
+            _ = command.ExecuteScalar();
+            return true;
+        });
+    }
 
-        // Ensure the SQLCipher encryption provider is initialized
-        SQLitePCL.Batteries_V2.Init();
-
+    public async Task OpenAsync(string path, string? password, DatabaseProfile? profile = null, bool readOnly = false)
+    {
+        if (!File.Exists(path))
+            throw new FileNotFoundException("The selected database file could not be found.", path);
+        profile ??= string.IsNullOrEmpty(password) ? DatabaseProfile.BuiltIns.First(x => x.Id == "plain") : DatabaseProfile.BuiltIns.First(x => x.Id == "sqlcipher4");
+        if (profile.Id is "sqlcipher3" or "sqlcipher-custom")
+            throw new NotSupportedException($"The '{profile.Name}' profile is defined for the editor, but this build uses the bundled SQLCipher 4 native provider. Use SQLCipher 4 or rebuild with a compatible native provider for this profile.");
         await Task.Run(() =>
         {
             Close();
-
-            var builder = new SqliteConnectionStringBuilder
-            {
-                DataSource = path,
-                Mode = readOnly ? SqliteOpenMode.ReadOnly : SqliteOpenMode.ReadWrite,
-                Cache = SqliteCacheMode.Private
-            };
-
+            var builder = new SqliteConnectionStringBuilder { DataSource = path, Mode = readOnly ? SqliteOpenMode.ReadOnly : SqliteOpenMode.ReadWrite, Cache = SqliteCacheMode.Private };
             if (!string.IsNullOrEmpty(password))
-                builder.Password = password; // SQLCipher bundle makes this work natively now
-
+                builder.Password = password;
             _connection = new SqliteConnection(builder.ToString());
             _connection.Open();
-
-            // This test query verifies if the password successfully decrypted the file
             using var command = _connection.CreateCommand();
             command.CommandText = "SELECT count(*) FROM sqlite_master;";
             _ = command.ExecuteScalar();
         });
-
         DatabasePath = path;
         ActiveKey = password;
         IsEncryptedConnection = !string.IsNullOrEmpty(password);
-
+        ActiveProfile = profile;
         await LoadTablesAsync();
-
         if (Tables.Count > 0)
             await SelectTableAsync(Tables[0]);
     }
-
 
     public async Task LoadTablesAsync()
     {
@@ -81,6 +92,7 @@ public sealed class DatabaseService : IDisposable
                 var columns = GetColumns(name);
                 var table = new DatabaseTable { Name = name, Sql = sql, HasRowId = !IsWithoutRowId(sql) };
                 table.Columns.AddRange(columns);
+                table.ForeignKeys.AddRange(GetForeignKeys(name));
                 result.Add(table);
             }
             foreach (var table in result)
@@ -135,56 +147,109 @@ public sealed class DatabaseService : IDisposable
         }
     }
 
-    public async Task UpdateCellAsync(DatabaseTable table, DatabaseRow row, DatabaseColumn column, object? value)
+    public async Task ApplyChangesAsync(DatabaseTable table, PendingChanges changes)
     {
         EnsureOpen();
-        if (!table.HasRowId || row.RowId is null)
+        if (!table.HasRowId)
             throw new InvalidOperationException("This table has no safe SQLite rowid for editing.");
-        await Task.Run(() => { using var cmd = _connection!.CreateCommand(); cmd.CommandText = $"UPDATE {QuoteIdentifier(table.Name)} SET {QuoteIdentifier(column.Name)}=$value WHERE rowid=$rowid;"; cmd.Parameters.AddWithValue("$value", value ?? DBNull.Value); cmd.Parameters.AddWithValue("$rowid", row.RowId.Value); if (cmd.ExecuteNonQuery() != 1) throw new InvalidOperationException("SQLite did not update exactly one row."); });
-        row.Values[column.Name] = value;
-    }
+        if (!changes.HasChanges)
+            return;
 
-    public async Task DeleteRowAsync(DatabaseTable table, DatabaseRow row)
-    {
-        EnsureOpen();
-        if (!table.HasRowId || row.RowId is null)
-            throw new InvalidOperationException("This table has no safe SQLite rowid for deletion.");
-        await Task.Run(() => { using var cmd = _connection!.CreateCommand(); cmd.CommandText = $"DELETE FROM {QuoteIdentifier(table.Name)} WHERE rowid=$rowid;"; cmd.Parameters.AddWithValue("$rowid", row.RowId.Value); if (cmd.ExecuteNonQuery() != 1) throw new InvalidOperationException("The row was not deleted."); });
-        table.Rows.Remove(row);
-        table.RowCount = Math.Max(0, table.RowCount - 1);
-    }
-
-    public async Task<DatabaseRow> InsertRowAsync(DatabaseTable table, IReadOnlyDictionary<string, object?> values)
-    {
-        EnsureOpen();
-        var columns = table.Columns.Where(c => values.ContainsKey(c.Name)).ToList();
-        if (columns.Count == 0)
-            throw new InvalidOperationException("There are no values to insert.");
-        DatabaseRow result = new();
         await Task.Run(() =>
         {
             using var transaction = _connection!.BeginTransaction();
-            using var cmd = _connection.CreateCommand();
-            cmd.Transaction = transaction;
-            cmd.CommandText = $"INSERT INTO {QuoteIdentifier(table.Name)} ({string.Join(", ", columns.Select(c => QuoteIdentifier(c.Name)))}) VALUES ({string.Join(", ", columns.Select((_, i) => $"$p{i}"))});";
-            for (var i = 0; i < columns.Count; i++)
+            try
             {
-                values.TryGetValue(columns[i].Name, out var v);
-                cmd.Parameters.AddWithValue($"$p{i}", v ?? DBNull.Value);
-            }
-            cmd.ExecuteNonQuery();
+                foreach (var change in changes.Updates)
+                {
+                    if (change.Row.RowId is null)
+                        throw new InvalidOperationException("An edited row no longer has a valid rowid.");
+                    using var cmd = _connection.CreateCommand();
+                    cmd.Transaction = transaction;
+                    cmd.CommandText = $"UPDATE {QuoteIdentifier(table.Name)} SET {QuoteIdentifier(change.Column.Name)}=$value WHERE rowid=$rowid;";
+                    cmd.Parameters.AddWithValue("$value", change.NewValue ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("$rowid", change.Row.RowId.Value);
+                    if (cmd.ExecuteNonQuery() != 1)
+                        throw new InvalidOperationException($"SQLite did not update row {change.Row.RowId.Value}.");
+                }
 
-            using var command = _connection.CreateCommand();
-            command.CommandText = "SELECT last_insert_rowid();";
-            var rowId = Convert.ToInt64(command.ExecuteScalar());
-            transaction.Commit();
-            result = new DatabaseRow { RowId = table.HasRowId ? rowId : null };
-            foreach (var c in table.Columns)
-                result.Values[c.Name] = values.TryGetValue(c.Name, out var v) ? v : null;
+                foreach (var insert in changes.Inserts)
+                {
+                    var columns = table.Columns.Where(c => insert.Values.ContainsKey(c.Name)).ToList();
+                    if (columns.Count == 0)
+                        throw new InvalidOperationException("An inserted row contains no values.");
+                    using var cmd = _connection.CreateCommand();
+                    cmd.Transaction = transaction;
+                    cmd.CommandText = $"INSERT INTO {QuoteIdentifier(table.Name)} ({string.Join(", ", columns.Select(c => QuoteIdentifier(c.Name)))}) VALUES ({string.Join(", ", columns.Select((_, i) => $"$p{i}"))});";
+                    for (var i = 0; i < columns.Count; i++)
+                        cmd.Parameters.AddWithValue($"$p{i}", insert.Values[columns[i].Name] ?? DBNull.Value);
+                    cmd.ExecuteNonQuery();
+                    using var command = _connection.CreateCommand();
+                    command.CommandText = "SELECT last_insert_rowid();";
+                    var newRowId = Convert.ToInt64(command.ExecuteScalar());
+                    insert.Row.Values.Clear();
+                    foreach (var column in table.Columns)
+                        insert.Row.Values[column.Name] = insert.Values.GetValueOrDefault(column.Name);
+                    insert.RowIdHolder = newRowId;
+                }
+
+                foreach (var delete in changes.Deletes)
+                {
+                    using var cmd = _connection.CreateCommand();
+                    cmd.Transaction = transaction;
+                    cmd.CommandText = $"DELETE FROM {QuoteIdentifier(table.Name)} WHERE rowid=$rowid;";
+                    cmd.Parameters.AddWithValue("$rowid", delete.RowId);
+                    if (cmd.ExecuteNonQuery() != 1)
+                        throw new InvalidOperationException($"SQLite did not delete row {delete.RowId}.");
+                }
+                transaction.Commit();
+            }
+            catch
+            {
+                try
+                {
+                    transaction.Rollback();
+                }
+                catch { }
+                throw;
+            }
         });
-        table.Rows.Add(result);
-        table.RowCount++;
-        return result;
+    }
+
+    public async Task<QueryResult> ExecuteQueryAsync(string sql)
+    {
+        EnsureOpen();
+        return string.IsNullOrWhiteSpace(sql)
+            ? throw new InvalidOperationException("Enter a SQL statement.")
+            : await Task.Run(() =>
+        {
+            using var command = _connection!.CreateCommand();
+            command.CommandText = sql;
+            using var reader = command.ExecuteReader();
+            var result = new QueryResult();
+            for (var i = 0; i < reader.FieldCount; i++)
+                result.Columns.Add(reader.GetName(i));
+            while (reader.Read() && result.Rows.Count < DatabaseConfiguration.MaxQueryRows)
+            {
+                var row = new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase);
+                for (var i = 0; i < reader.FieldCount; i++)
+                    row[result.Columns[i]] = reader.IsDBNull(i) ? null : reader.GetValue(i);
+                result.Rows.Add(row);
+            }
+            return result;
+        });
+    }
+
+    public void CheckpointForBackup()
+    {
+        EnsureOpen();
+        using var command = _connection!.CreateCommand();
+        command.CommandText = "PRAGMA wal_checkpoint(FULL);";
+        try
+        {
+            command.ExecuteNonQuery();
+        }
+        catch (SqliteException) { }
     }
 
     private List<DatabaseColumn> GetColumns(string tableName)
@@ -195,6 +260,27 @@ public sealed class DatabaseService : IDisposable
         var list = new List<DatabaseColumn>();
         while (reader.Read())
             list.Add(new DatabaseColumn { Index = reader.GetInt32(0), Name = reader.GetString(1), DataType = reader.IsDBNull(2) ? "ANY" : reader.GetString(2), IsNotNull = reader.GetInt32(3) != 0, DefaultValue = reader.IsDBNull(4) ? null : reader.GetString(4), IsPrimaryKey = reader.GetInt32(5) != 0 });
+        return list;
+    }
+
+    private List<DatabaseForeignKey> GetForeignKeys(string tableName)
+    {
+        using var cmd = _connection!.CreateCommand();
+        cmd.CommandText = $"PRAGMA foreign_key_list({QuoteIdentifier(tableName)});";
+        using var reader = cmd.ExecuteReader();
+        var list = new List<DatabaseForeignKey>();
+        while (reader.Read())
+        {
+            list.Add(new DatabaseForeignKey
+            {
+                Id = reader.GetInt32(0),
+                ReferencedTable = reader.IsDBNull(2) ? string.Empty : reader.GetString(2),
+                FromColumn = reader.IsDBNull(3) ? string.Empty : reader.GetString(3),
+                ReferencedColumn = reader.IsDBNull(4) ? string.Empty : reader.GetString(4),
+                OnUpdate = reader.IsDBNull(5) ? string.Empty : reader.GetString(5),
+                OnDelete = reader.IsDBNull(6) ? string.Empty : reader.GetString(6)
+            });
+        }
         return list;
     }
     private long GetRowCount(string name)
@@ -220,6 +306,7 @@ public sealed class DatabaseService : IDisposable
         DatabasePath = string.Empty;
         ActiveKey = null;
         IsEncryptedConnection = false;
+        ActiveProfile = null;
     }
     public void Dispose() => Close();
 }

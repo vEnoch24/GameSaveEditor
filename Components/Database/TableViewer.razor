@@ -1,108 +1,1076 @@
 ﻿@using System.Globalization
+@using System.Linq
+@using System.Text.Json
 @using Microsoft.AspNetCore.Components.Web
+@using GameSaveEditor.Models
 
 <div class="table-view">
-    <div class="table-header"><div><div class="eyebrow">TABLE</div><h1>@Table.Name</h1><div class="table-summary">@Table.Columns.Count columns <span>•</span> @Table.RowCount.ToString("N0") rows @if(!Table.HasRowId){
-        <><span>•</span><span class="warning-inline">No rowid: editing disabled</span></>
-    }
-</div></div><div class="table-actions"><button class="btn btn-secondary" @onclick="ReloadAsync">↻ Refresh</button>@if(Table.HasRowId){
-<button class="btn btn-primary" @onclick="ShowInsertDialog">＋ Add row</button>
-}
-</div></div>
-<div class="schema-strip">@foreach(var c in Table.Columns){
-    <div class="column-chip"><span class="column-name">@c.Name</span><span class="column-type">@c.DataType</span>@if(c.IsPrimaryKey){
-        <span class="pk-badge">PK</span>
-    }
-    @if (c.IsNotNull)
+    <!-- HEADER -->
+    <div class="table-header">
+        <div>
+            <div class="eyebrow">TABLE</div>
+            <h1>@Table.Name</h1>
+            <div class="table-summary">
+                @Table.Columns.Count columns
+                <span>•</span>
+                @Table.RowCount.ToString("N0") rows
+                @if (!Table.HasRowId)
+                {
+                    <><span>•</span><span class="warning-inline">WITHOUT ROWID: editing disabled</span></>
+                }
+            </div>
+        </div>
+        <div class="table-actions">
+            @if (_pending.HasChanges)
+            {
+                <span class="pending-pill">@_pending.Count pending</span>
+            }
+            <button class="btn btn-secondary" @onclick="Undo" disabled="@(!_undo.Any() || _isSaving)">↶ Undo</button>
+            <button class="btn btn-secondary" @onclick="Redo" disabled="@(!_redo.Any() || _isSaving)">↷ Redo</button>
+            <button class="btn btn-secondary" @onclick="ReloadAsync" disabled="@_isSaving">↻ Refresh</button>
+            @if (Table.HasRowId)
+            {
+                <button class="btn btn-secondary" @onclick="ShowInsertDialog" disabled="@_isSaving">＋ Add row</button>
+            }
+            @if (_pending.HasChanges)
+            {
+                <button class="btn btn-secondary" @onclick="DiscardChangesAsync" disabled="@_isSaving">Discard</button>
+                <button class="btn btn-primary" @onclick="SaveChangesAsync" disabled="@_isSaving">
+                    @( _isSaving ? "Saving…" : $"Save Changes ({_pending.Count})" )
+                </button>
+            }
+        </div>
+    </div>
+
+    <!-- SCHEMA STRIP -->
+    <div class="schema-strip">
+        @foreach (var c in Table.Columns)
+        {
+            <div class="column-chip">
+                <span class="column-name">@c.Name</span>
+                <span class="column-type">@c.DataType</span>
+                @if (c.IsPrimaryKey) { <span class="pk-badge">PK</span> }
+                @if (c.IsNotNull) { <span class="required-badge">NOT NULL</span> }
+                @if (Table.ForeignKeys.Any(f => f.FromColumn.Equals(c.Name, StringComparison.OrdinalIgnoreCase)))
+                {
+                    <span class="fk-badge">FK</span>
+                }
+            </div>
+        }
+    </div>
+
+    <!-- RELATIONSHIPS -->
+    @if (Table.ForeignKeys.Count > 0)
     {
-        <span class="required-badge">NOT NULL</span>
+        <div class="relationship-strip">
+            <strong>Relationships</strong>
+            @foreach (var fk in Table.ForeignKeys)
+            {
+                <span>
+                    <code>@fk.FromColumn</code> → <code>@fk.ReferencedTable.@fk.ReferencedColumn</code>
+                </span>
+            }
+        </div>
     }
-</div>
-}
-</div>
-<div class="toolbar"><div class="search-box"><span class="search-icon">⌕</span><input placeholder="Search loaded rows..." @bind="_search" @bind:event="oninput" /></div><div class="toolbar-info">@FilteredRows.Count.ToString("N0") visible <span>•</span> double-click a cell to edit</div></div>
-@if (Table.Rows.Count == 0)
-{
-    <div class="empty-table"><div class="empty-icon">∅</div><h2>No rows</h2><p>This table currently contains no data.</p></div>
-}
-else
-{
 
-    <div class="grid-container"><table class="data-grid"><thead><tr><th class="row-number-header">#</th>@foreach(var c in Table.Columns){
-        <th><div class="header-content"><span>@c.Name</span><small>@c.DataType</small></div></th>
-    }
-    @if (Table.HasRowId)
+    <!-- PENDING CHANGES -->
+    @if (_pending.HasChanges)
     {
-        <th>ACTION</th>
+        <div class="change-strip">
+            <div>
+                <strong>Unsaved changes</strong>
+                <span>All edits remain in memory until you explicitly save.</span>
+            </div>
+            <button class="link-button" @onclick="() => _showDiff = true">View diff</button>
+        </div>
     }
-</tr></thead><tbody>@{
-var n = 0;
-}
-@foreach (var row in FilteredRows)
-{
-    n++;
-    <tr><td class="row-number">@n</td>@foreach(var c in Table.Columns){var value=row.GetValue(c.Name);
-        <td class="editable-cell" @ondblclick="() => BeginEdit(row, c)">@if(_editingRow==row&&_editingColumn==c){
-            <input class="cell-editor" @bind="_editText" @bind:event="oninput" @onkeydown="e => HandleEditKeyDown(e, row, c)" @onblur="() => CommitEditAsync(row, c)" />
-        }else if (value is null)
-        {
 
-            <span class="null-value">NULL</span>
-        }
-        else if (value is byte[] b)
-        {
+    <!-- TOOLBAR -->
+    <div class="toolbar editor-toolbar">
+        <div class="search-box">
+            <span class="search-icon">⌕</span>
+            <input placeholder="Search loaded rows..." @bind="_search" @bind:event="oninput" />
+        </div>
+        <div class="toolbar-controls">
+            <label>
+                Rows
+                <select class="compact-select" @bind="_pageSize" @bind:after="ResetPage">
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                    <option value="250">250</option>
+                </select>
+            </label>
+            <button class="btn btn-secondary" @onclick="ClearFilters" disabled="@(string.IsNullOrEmpty(_search) && _sortColumn is null)">
+                Clear filters
+            </button>
+        </div>
+    </div>
 
-            <span class="blob-value">BLOB · @b.Length bytes</span>
-        }
-        else
-        {
+    <!-- INFO ROW -->
+    <div class="toolbar-info-row">
+        <span>@FilteredRows.Count().ToString("N0") matching rows <span>•</span> page @_page of @PageCount</span>
+        <span>Double-click a cell to open the type-aware editor</span>
+    </div>
 
-            <span class="cell-value">@FormatValue(value)</span>
-        }
-    </td>
-}
-@if (Table.HasRowId)
-{
-    <td><button class="delete-button" @onclick="() => ConfirmDeleteAsync(row)">Delete</button></td>
-}
-</tr>
-}
-</tbody></table></div>
-}
-<div class="viewer-footer"><span class="editable-badge">EDITABLE</span><span>Every write creates a timestamped backup beside the database first.</span></div>
+    <!-- EMPTY STATE -->
+    @if (Table.Rows.Count == 0)
+    {
+        <div class="empty-table">
+            <div class="empty-icon">∅</div>
+            <h2>No rows</h2>
+            <p>This table currently contains no data.</p>
+        </div>
+    }
+    else
+    {
+        <!-- DATA GRID -->
+        <div class="grid-container">
+            <table class="data-grid">
+                <thead>
+                    <tr>
+                        <th class="row-number-header">#</th>
+                        @foreach (var c in Table.Columns)
+                        {
+                            <th class="sortable-header">
+                                <button class="sort-button" @onclick="() => SortBy(c)">
+                                    <span>@c.Name</span>
+                                    <small>@c.DataType @(c.IsPrimaryKey ? "· PK" : "")</small>
+                                    <b>@SortIndicator(c)</b>
+                                </button>
+                            </th>
+                        }
+                        @if (Table.HasRowId)
+                        {
+                            <th>ACTION</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        var n = ((CurrentPageIndex) * _pageSize);
+                    }
+                    @foreach (var row in PagedRows)
+                    {
+                        n++;
+                        <tr class="@(IsInserted(row) ? "pending-row" : "") @(IsDeleted(row) ? "deleted-row" : "")">
+                            <td class="row-number">@n</td>
+                            @foreach (var c in Table.Columns)
+                            {
+                                var value = row.GetValue(c.Name);
+                                var changed = IsChanged(row, c);
+                                <td class="editable-cell @(changed ? "changed-cell" : "")"
+                                    title="@(IsJsonColumn(c, value) ? "JSON value — double-click to edit" : value is byte[] ? "BLOB — double-click to view/edit" : "Double-click to edit")"
+                                    @ondblclick="() => BeginEdit(row, c)">
+                                    @RenderCell(c, value)
+                                </td>
+                            }
+                            @if (Table.HasRowId)
+                            {
+                                <td>
+                                    <button class="delete-button @(IsDeleted(row) ? "restore-button" : "")"
+                                            @onclick="() => ToggleDelete(row)">
+                                        @(IsDeleted(row) ? "Undo" : "Delete")
+                                    </button>
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- PAGINATION -->
+        <div class="pagination">
+            <button class="btn btn-secondary" @onclick="() => GoPage(1)" disabled="@(_page <= 1)">«</button>
+            <button class="btn btn-secondary" @onclick="() => GoPage(_page - 1)" disabled="@(_page <= 1)">‹</button>
+            <span>Page <strong>@_page</strong> / @PageCount</span>
+            <button class="btn btn-secondary" @onclick="() => GoPage(_page + 1)" disabled="@(_page >= PageCount)">›</button>
+            <button class="btn btn-secondary" @onclick="() => GoPage(PageCount)" disabled="@(_page >= PageCount)">»</button>
+        </div>
+    }
+
+    <!-- FOOTER -->
+    <div class="viewer-footer">
+        <span class="editable-badge">STAGED EDITOR</span>
+        <span>Undo/redo applies to unsaved changes. One backup is created before each Save Changes transaction.</span>
+    </div>
 </div>
 
+<!-- ============================================================== -->
+<!-- MODALS -->
+<!-- ============================================================== -->
+
+<!-- EDIT VALUE MODAL -->
+@if (_editingRow is not null && _editingColumn is not null)
+{
+    <div class="modal-backdrop">
+        <div class="modal-card wide-modal editor-modal">
+            <div class="modal-header">
+                <div>
+                    <div class="eyebrow">EDIT VALUE</div>
+                    <h2>@_editingColumn.Name</h2>
+                    <p class="modal-subtitle">
+                        @_editingColumn.DataType
+                        @(_editingColumn.IsPrimaryKey ? "· PRIMARY KEY" : "")
+                        @(_editingColumn.IsNotNull ? "· NOT NULL" : "")
+                    </p>
+                </div>
+                <button class="icon-button" @onclick="CancelEdit">×</button>
+            </div>
+
+            @if (_editorKind == "bool")
+            {
+                <select class="text-input" @bind="_editText">
+                    <option value="">NULL</option>
+                    <option value="true">TRUE</option>
+                    <option value="false">FALSE</option>
+                </select>
+            }
+            else if (_editorKind == "date")
+            {
+                <input class="text-input" type="datetime-local" @bind="_editDateTime" @bind:format="yyyy-MM-ddTHH:mm" />
+            }
+            else if (_editorKind == "json")
+            {
+                <textarea class="value-editor code-editor" @bind="_editText" @bind:event="oninput"></textarea>
+                <div class="editor-help">JSON is validated before staging the change.</div>
+            }
+            else if (_editorKind == "blob")
+            {
+                <textarea class="value-editor code-editor" @bind="_editText" @bind:event="oninput"></textarea>
+                <div class="editor-help">
+                    BLOB values are represented as Base64. Current size: @(_editingOriginal is byte[] b ? b.Length : 0) bytes.
+                </div>
+            }
+            else if (_editorKind == "number")
+            {
+                <input class="text-input" inputmode="decimal" @bind="_editText" @bind:event="oninput" @onkeydown="e => HandleEditKeyDown(e)" />
+            }
+            else
+            {
+                <textarea class="value-editor" @bind="_editText" @bind:event="oninput" @onkeydown="e => HandleEditKeyDown(e)"></textarea>
+            }
+
+            @if (_editError is not null)
+            {
+                <div class="editor-error">! @_editError</div>
+            }
+
+            <div class="modal-actions">
+                <button class="btn btn-secondary" @onclick="CancelEdit">Cancel</button>
+                <button class="btn btn-primary" @onclick="CommitEditAsync">Stage change</button>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- DIFF MODAL -->
+@if (_showDiff)
+{
+    <div class="modal-backdrop">
+        <div class="modal-card wide-modal">
+            <div class="modal-header">
+                <div>
+                    <div class="eyebrow">REVIEW</div>
+                    <h2>Pending changes</h2>
+                </div>
+                <button class="icon-button" @onclick="() => _showDiff = false">×</button>
+            </div>
+            <div class="diff-list">
+                @foreach (var x in _pending.Updates)
+                {
+                    <div class="diff-item">
+                        <span class="diff-kind">EDIT</span>
+                        <strong>@x.Column.Name</strong>
+                        <span class="diff-old">@DisplayDiff(x.OriginalValue)</span>
+                        <span>→</span>
+                        <span class="diff-new">@DisplayDiff(x.NewValue)</span>
+                    </div>
+                }
+                @foreach (var x in _pending.Inserts)
+                {
+                    <div class="diff-item">
+                        <span class="diff-kind insert">INSERT</span>
+                        <strong>New row</strong>
+                        <span>@x.Values.Count values</span>
+                    </div>
+                }
+                @foreach (var x in _pending.Deletes)
+                {
+                    <div class="diff-item">
+                        <span class="diff-kind delete">DELETE</span>
+                        <strong>rowid @x.RowId</strong>
+                    </div>
+                }
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-primary" @onclick="() => _showDiff = false">Done</button>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- DELETE MODAL -->
 @if (_showDelete && _deleteRow is not null)
 {
-    <div class="modal-backdrop"><div class="modal-card"><div class="modal-header"><div><div class="eyebrow">DELETE ROW</div><h2>Delete this row?</h2></div><button class="icon-button" @onclick="CancelDelete">×</button></div><p class="modal-description">A backup of the database will be created before deletion.</p><div class="modal-actions"><button class="btn btn-secondary" @onclick="CancelDelete">Cancel</button><button class="btn btn-danger" @onclick="DeleteConfirmedAsync">Delete row</button></div></div></div>
-}
-@if (_showInsert)
-{
-    <div class="modal-backdrop"><div class="modal-card insert-modal"><div class="modal-header"><div><div class="eyebrow">INSERT ROW</div><h2>New row</h2></div><button class="icon-button" @onclick="CancelInsert">×</button></div><div class="insert-form">@foreach(var c in Table.Columns){
-        <div class="field-group"><label class="field-label">@c.Name <span>@c.DataType</span></label><input class="text-input" placeholder="NULL" @bind="_insert[c.Name]" @bind:event="oninput" /></div>
-    }
-</div><div class="modal-actions"><button class="btn btn-secondary" @onclick="CancelInsert">Cancel</button><button class="btn btn-primary" @onclick="InsertAsync">Insert row</button></div></div></div>
+    <div class="modal-backdrop">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div>
+                    <div class="eyebrow">DELETE ROW</div>
+                    <h2>Stage this row for deletion?</h2>
+                </div>
+                <button class="icon-button" @onclick="CancelDelete">×</button>
+            </div>
+            <p class="modal-description">Nothing is written until Save Changes. You can undo the deletion before saving.</p>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" @onclick="CancelDelete">Cancel</button>
+                <button class="btn btn-danger" @onclick="StageDeleteAsync">Stage deletion</button>
+            </div>
+        </div>
+    </div>
 }
 
+<!-- INSERT MODAL -->
+@if (_showInsert)
+{
+    <div class="modal-backdrop">
+        <div class="modal-card insert-modal">
+            <div class="modal-header">
+                <div>
+                    <div class="eyebrow">INSERT ROW</div>
+                    <h2>New row</h2>
+                </div>
+                <button class="icon-button" @onclick="CancelInsert">×</button>
+            </div>
+            <div class="insert-form">
+                @foreach (var c in Table.Columns)
+                {
+                    <div class="field-group">
+                        <label class="field-label">
+                            @c.Name <span>@c.DataType @(c.IsPrimaryKey ? "· PK" : "")</span>
+                        </label>
+                        @if (IsBoolean(c))
+                        {
+                            <select class="text-input" @bind="_insert[c.Name]">
+                                <option value="">NULL</option>
+                                <option value="true">TRUE</option>
+                                <option value="false">FALSE</option>
+                            </select>
+                        }
+                        else if (IsDate(c))
+                        {
+                               var col = c;
+                                <input class="text-input" 
+                                       type="datetime-local" 
+                                       value="@GetDateValue(col.Name)" 
+                                       @oninput="@(e => SetDateValue(col.Name, e.Value?.ToString() ?? ""))"  />
+                        }
+                        else if (IsJsonColumn(c, null))
+                        {
+                            <textarea class="value-editor" @bind="_insert[c.Name]" @bind:event="oninput" placeholder="JSON"></textarea>
+                        }
+                        else
+                        {
+                            <input class="text-input" placeholder="NULL" @bind="_insert[c.Name]" @bind:event="oninput" />
+                        }
+                    </div>
+                }
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" @onclick="CancelInsert">Cancel</button>
+                <button class="btn btn-primary" @onclick="StageInsertAsync">Stage row</button>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- ============================================================== -->
+<!-- CODE BLOCK -->
+<!-- ============================================================== -->
 @code {
+    // =============================================================
+    // PARAMETERS
+    // =============================================================
     [Parameter, EditorRequired] public DatabaseTable Table { get; set; } = null!;
     [Parameter, EditorRequired] public DatabaseService Database { get; set; } = null!;
     [Parameter, EditorRequired] public BackupService BackupService { get; set; } = null!;
     [Parameter] public EventCallback<string> OnError { get; set; }
     [Parameter] public EventCallback<string> OnMessage { get; set; }
-    private string _search = ""; private DatabaseRow? _editingRow; private DatabaseColumn? _editingColumn; private string _editText = ""; private bool _showDelete; private DatabaseRow? _deleteRow; private bool _showInsert; private readonly Dictionary<string, string> _insert = new(StringComparer.OrdinalIgnoreCase);
-    private List<DatabaseRow> FilteredRows => string.IsNullOrWhiteSpace(_search) ? Table.Rows : Table.Rows.Where(r => r.Values.Values.Any(v => v?.ToString()?.Contains(_search, StringComparison.OrdinalIgnoreCase) == true)).ToList();
-    private void BeginEdit(DatabaseRow r, DatabaseColumn c) { _editingRow = r; _editingColumn = c; var v = r.GetValue(c.Name); _editText = v is byte[] b ? Convert.ToBase64String(b) : v?.ToString() ?? ""; }
-    private async Task HandleEditKeyDown(KeyboardEventArgs e, DatabaseRow r, DatabaseColumn c) { if (e.Key == "Enter") await CommitEditAsync(r, c); else if (e.Key == "Escape") CancelEdit(); }
-    private async Task CommitEditAsync(DatabaseRow r, DatabaseColumn c) { if (_editingRow != r || _editingColumn != c) return; var old = r.GetValue(c.Name); if (_editText == (old?.ToString() ?? "")) { CancelEdit(); return; } try { var backup = await BackupService.CreateBackupAsync(Database.DatabasePath); await Database.UpdateCellAsync(Table, r, c, ConvertFromText(_editText, c, old)); CancelEdit(); await OnMessage.InvokeAsync($"Saved. Backup created: {Path.GetFileName(backup)}"); } catch (Exception ex) { CancelEdit(); await OnError.InvokeAsync(ex.Message); } }
-    private void CancelEdit() { _editingRow = null; _editingColumn = null; _editText = ""; }
-    private Task ReloadAsync() => Database.ReloadAsync();
-    private Task ConfirmDeleteAsync(DatabaseRow r) { _deleteRow = r; _showDelete = true; return Task.CompletedTask; }
-    private void CancelDelete() { _deleteRow = null; _showDelete = false; }
-    private async Task DeleteConfirmedAsync() { if (_deleteRow is null) return; try { var backup = await BackupService.CreateBackupAsync(Database.DatabasePath); await Database.DeleteRowAsync(Table, _deleteRow); CancelDelete(); await OnMessage.InvokeAsync($"Row deleted. Backup created: {Path.GetFileName(backup)}"); } catch (Exception ex) { CancelDelete(); await OnError.InvokeAsync(ex.Message); } }
-    private void ShowInsertDialog() { _insert.Clear(); foreach (var c in Table.Columns) _insert[c.Name] = ""; _showInsert = true; }
-    private void CancelInsert() { _showInsert = false; _insert.Clear(); }
-    private async Task InsertAsync() { try { var values = new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase); foreach (var c in Table.Columns) { var text = _insert.GetValueOrDefault(c.Name, ""); if (c.IsPrimaryKey && c.DataType.Contains("INT", StringComparison.OrdinalIgnoreCase) && string.IsNullOrWhiteSpace(text)) continue; values[c.Name] = ConvertFromText(text, c, null); } var backup = await BackupService.CreateBackupAsync(Database.DatabasePath); await Database.InsertRowAsync(Table, values); CancelInsert(); await OnMessage.InvokeAsync($"Row inserted. Backup created: {Path.GetFileName(backup)}"); } catch (Exception ex) { await OnError.InvokeAsync(ex.Message); } }
-    private static object? ConvertFromText(string text, DatabaseColumn c, object? existing) { if (string.IsNullOrWhiteSpace(text)) return null; if (existing is byte[]) { try { return Convert.FromBase64String(text); } catch { throw new FormatException($"'{c.Name}' expects Base64 BLOB data."); } } var t = c.DataType.ToUpperInvariant(); if (t.Contains("INT")) { if (long.TryParse(text, NumberStyles.Integer, CultureInfo.InvariantCulture, out var i)) return i; throw new FormatException($"'{c.Name}' expects an integer."); } if (t.Contains("REAL") || t.Contains("FLOA") || t.Contains("DOUB")) { if (double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out var d)) return d; throw new FormatException($"'{c.Name}' expects a number."); } return text; }
-    private static string FormatValue(object v) => v switch { double d => d.ToString("G17", CultureInfo.InvariantCulture), float f => f.ToString("G9", CultureInfo.InvariantCulture), DateTime dt => dt.ToString("O", CultureInfo.InvariantCulture), _ => v.ToString() ?? "" };
+
+    // =============================================================
+    // FIELDS
+    // =============================================================
+    private readonly PendingChanges _pending = new();
+    private readonly HashSet<DatabaseRow> _insertedRows = [];
+    private readonly HashSet<DatabaseRow> _deletedRows = [];
+    private readonly Stack<EditorAction> _undo = new();
+    private readonly Stack<EditorAction> _redo = new();
+    private readonly Dictionary<string, string> _insert = new(StringComparer.OrdinalIgnoreCase);
+
+    private string _search = "";
+    private string? _sortColumn;
+    private bool _sortDescending;
+    private int _page = 1;
+    private int _pageSize = 50;
+
+    private DatabaseRow? _editingRow;
+    private DatabaseColumn? _editingColumn;
+    private object? _editingOriginal;
+    private string _editText = "";
+    private string _editorKind = "text";
+    private string? _editError;
+
+    private DateTime? _editDateTime;
+
+    private DateTime? _insertDateTime;
+    private string _insertColumnName = "";
+
+    private bool _showDelete;
+    private bool _showInsert;
+    private bool _showDiff;
+    private bool _isSaving;
+    private bool _historyReplay;
+    private DatabaseRow? _deleteRow;
+
+    // =============================================================
+    // COMPUTED PROPERTIES
+    // =============================================================
+    private IEnumerable<DatabaseRow> FilteredRows => ApplySort(Table.Rows.Where(MatchesSearch));
+    private List<DatabaseRow> FilteredList => FilteredRows.ToList();
+    private int PageCount => Math.Max(1, (int)Math.Ceiling(FilteredList.Count / (double)_pageSize));
+    private int CurrentPageIndex => Math.Clamp(_page - 1, 0, PageCount - 1);
+    private IEnumerable<DatabaseRow> PagedRows => FilteredList.Skip(CurrentPageIndex * _pageSize).Take(_pageSize);
+
+    // =============================================================
+    // FILTERING / SORTING / PAGINATION
+    // =============================================================
+    private bool MatchesSearch(DatabaseRow row)
+    {
+        return string.IsNullOrWhiteSpace(_search) ||
+               row.Values.Any(x => DisplayDiff(x.Value).Contains(_search, StringComparison.OrdinalIgnoreCase));
+    }
+
+    private IEnumerable<DatabaseRow> ApplySort(IEnumerable<DatabaseRow> rows)
+    {
+        if (_sortColumn is null) return rows;
+        return _sortDescending
+            ? rows.OrderByDescending(r => SortValue(r.GetValue(_sortColumn)))
+            : rows.OrderBy(r => SortValue(r.GetValue(_sortColumn)));
+    }
+
+    private static string SortValue(object? v) =>
+        v is byte[] b ? Convert.ToBase64String(b) : v?.ToString() ?? "";
+
+    private string SortIndicator(DatabaseColumn c)
+    {
+        if (_sortColumn?.Equals(c.Name, StringComparison.OrdinalIgnoreCase) == true)
+            return _sortDescending ? "▼" : "▲";
+        return "";
+    }
+
+    private void SortBy(DatabaseColumn c)
+    {
+        if (_sortColumn?.Equals(c.Name, StringComparison.OrdinalIgnoreCase) == true)
+            _sortDescending = !_sortDescending;
+        else
+        {
+            _sortColumn = c.Name;
+            _sortDescending = false;
+        }
+        _page = 1;
+    }
+
+    private void ResetPage() => _page = 1;
+    private void ClearFilters()
+    {
+        _search = "";
+        _sortColumn = null;
+        _sortDescending = false;
+        _page = 1;
+    }
+
+    private void GoPage(int page) => _page = Math.Clamp(page, 1, PageCount);
+
+    // =============================================================
+    // EDITING
+    // =============================================================
+    private void BeginEdit(DatabaseRow row, DatabaseColumn column)
+    {
+        if (!Table.HasRowId || IsDeleted(row) || _isSaving) return;
+
+        _editingRow = row;
+        _editingColumn = column;
+        _editingOriginal = row.GetValue(column.Name);
+        _editError = null;
+        _editorKind = GetEditorKind(column, _editingOriginal);
+        _editText = ToEditorText(_editingOriginal, column);
+        _editDateTime = DateTime.TryParse(_editText, out var dt) ? dt : null;
+    }
+
+    private async Task HandleEditKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Escape") CancelEdit();
+        else if (e.Key == "Enter" && _editorKind != "text" && _editorKind != "json")
+            await CommitEditAsync();
+    }
+
+    private void CancelEdit()
+    {
+        _editingRow = null;
+        _editingColumn = null;
+        _editingOriginal = null;
+        _editText = "";
+        _editError = null;
+    }
+
+    private async Task CommitEditAsync()
+    {
+        if (_editingRow is null || _editingColumn is null) return;
+
+        try
+        {
+            if (_editorKind == "date")
+            {
+                _editText = _editDateTime?.ToString("yyyy-MM-ddTHH:mm") ?? "";
+            }
+            
+            var row = _editingRow;
+            var col = _editingColumn;
+            var old = row.GetValue(col.Name);
+            var converted = ConvertFromText(_editText, col, old);
+
+
+            if (ValuesEqual(old, converted))
+            {
+                CancelEdit();
+                return;
+            }
+
+            if (IsNotNullViolation(col, converted))
+                throw new FormatException($"'{col.Name}' is NOT NULL.");
+
+            ApplyEdit(row, col, converted, recordHistory: true);
+            CancelEdit();
+            await InvokeAsync(StateHasChanged);
+        }
+        catch (Exception ex)
+        {
+            _editError = ex.Message;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private void ApplyEdit(DatabaseRow row, DatabaseColumn col, object? value, bool recordHistory)
+    {
+        var old = row.GetValue(col.Name);
+        if (ValuesEqual(old, value)) return;
+
+        void Apply(object? v)
+        {
+            row.Values[col.Name] = v;
+
+            var ins = _pending.Inserts.FirstOrDefault(x => x.Row == row);
+            if (ins is not null)
+            {
+                ins.Values[col.Name] = v;
+                return;
+            }
+
+            var existing = _pending.Updates.FirstOrDefault(x =>
+                x.Row == row && x.Column.Name.Equals(col.Name, StringComparison.OrdinalIgnoreCase));
+
+            if (existing is null)
+            {
+                _pending.Updates.Add(new PendingCellChange
+                {
+                    Row = row,
+                    Column = col,
+                    OriginalValue = old,
+                    NewValue = v
+                });
+            }
+            else
+            {
+                existing.NewValue = v;
+                if (ValuesEqual(existing.OriginalValue, v))
+                    _pending.Updates.Remove(existing);
+            }
+        }
+
+        Apply(value);
+
+        if (recordHistory && !_historyReplay)
+        {
+            var before = old;
+            var after = value;
+            PushAction(new EditorAction(() => Apply(before), () => Apply(after)));
+        }
+    }
+
+    private void PushAction(EditorAction action)
+    {
+        _undo.Push(action);
+        _redo.Clear();
+    }
+
+    private void Undo()
+    {
+        if (!_undo.TryPop(out var a)) return;
+        _historyReplay = true;
+        try { a.Undo(); _redo.Push(a); }
+        finally { _historyReplay = false; }
+        StateHasChanged();
+    }
+
+    private void Redo()
+    {
+        if (!_redo.TryPop(out var a)) return;
+        _historyReplay = true;
+        try { a.Redo(); _undo.Push(a); }
+        finally { _historyReplay = false; }
+        StateHasChanged();
+    }
+
+    // =============================================================
+    // SAVE / DISCARD / RELOAD
+    // =============================================================
+    private async Task SaveChangesAsync()
+    {
+        if (!_pending.HasChanges || _isSaving) return;
+
+        _isSaving = true;
+        try
+        {
+            Database.CheckpointForBackup();
+            var count = _pending.Count;
+            var backup = await BackupService.CreateBackupAsync(Database.DatabasePath);
+            await Database.ApplyChangesAsync(Table, _pending);
+            await Database.SelectTableAsync(Table);
+            ClearPendingState();
+            await OnMessage.InvokeAsync($"Saved {count} change{(count == 1 ? "" : "s")}. Backup: {Path.GetFileName(backup)}");
+        }
+        catch (Exception ex)
+        {
+            await OnError.InvokeAsync($"Save failed. The transaction was rolled back and the backup was preserved. {ex.Message}");
+            await Database.SelectTableAsync(Table);
+            ClearPendingState();
+        }
+        finally
+        {
+            _isSaving = false;
+        }
+    }
+
+    private void ClearPendingState()
+    {
+        _pending.Clear();
+        _insertedRows.Clear();
+        _deletedRows.Clear();
+        _undo.Clear();
+        _redo.Clear();
+    }
+
+    private async Task DiscardChangesAsync()
+    {
+        if (!_pending.HasChanges) return;
+        CancelEdit();
+        ClearPendingState();
+        await Database.SelectTableAsync(Table);
+        _page = Math.Min(_page, PageCount);
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task ReloadAsync()
+    {
+        CancelEdit();
+        if (_pending.HasChanges) ClearPendingState();
+        await Database.ReloadAsync();
+        _page = 1;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    // =============================================================
+    // DELETE
+    // =============================================================
+    private async Task ToggleDelete(DatabaseRow row)
+    {
+        if (_insertedRows.Contains(row))
+        {
+            var ins = _pending.Inserts.FirstOrDefault(x => x.Row == row);
+            if (ins is not null) _pending.Inserts.Remove(ins);
+            _insertedRows.Remove(row);
+            Table.Rows.Remove(row);
+            Table.RowCount = Math.Max(0, Table.RowCount - 1);
+            _undo.Clear();
+            _redo.Clear();
+            return;
+        }
+
+        if (_deletedRows.Contains(row))
+        {
+            RestoreDelete(row, true);
+            return;
+        }
+
+        _deleteRow = row;
+        _showDelete = true;
+    }
+
+    private void RestoreDelete(DatabaseRow row, bool history)
+    {
+        var d = _pending.Deletes.FirstOrDefault(x => x.Row == row);
+        if (d is not null) _pending.Deletes.Remove(d);
+        _deletedRows.Remove(row);
+
+        if (history && !_historyReplay)
+            PushAction(new EditorAction(() => StageDeleteCore(row), () => RestoreDelete(row, false)));
+    }
+
+    private void StageDeleteCore(DatabaseRow row)
+    {
+        if (row.RowId is long id && !_deletedRows.Contains(row))
+        {
+            _deletedRows.Add(row);
+            if (!_pending.Deletes.Any(x => x.Row == row))
+                _pending.Deletes.Add(new PendingDelete { Row = row, RowId = id });
+        }
+    }
+
+    private Task CancelDelete()
+    {
+        _deleteRow = null;
+        _showDelete = false;
+        return Task.CompletedTask;
+    }
+
+    private Task StageDeleteAsync()
+    {
+        if (_deleteRow is not null)
+        {
+            var row = _deleteRow;
+            StageDeleteCore(row);
+            if (!_historyReplay)
+                PushAction(new EditorAction(() => RestoreDelete(row, false), () => StageDeleteCore(row)));
+        }
+        return CancelDelete();
+    }
+
+    // =============================================================
+    // INSERT
+    // =============================================================
+    private void ShowInsertDialog()
+    {
+        _insert.Clear();
+        foreach (var c in Table.Columns)
+            _insert[c.Name] = "";
+        _showInsert = true;
+    }
+
+    private void CancelInsert()
+    {
+        _showInsert = false;
+        _insert.Clear();
+    }
+
+    private async Task StageInsertAsync()
+    {
+        try
+        {
+            var values = new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var c in Table.Columns)
+            {
+                var text = _insert.GetValueOrDefault(c.Name, "");
+
+                if (c.IsPrimaryKey && c.DataType.Contains("INT", StringComparison.OrdinalIgnoreCase) &&
+                    string.IsNullOrWhiteSpace(text))
+                    continue;
+
+                var value = ConvertFromText(text, c, null);
+
+                if (IsNotNullViolation(c, value))
+                    throw new FormatException($"'{c.Name}' is NOT NULL.");
+
+                if (IsJsonColumn(c, value) && value is string j)
+                    JsonDocument.Parse(j);
+
+                values[c.Name] = value;
+            }
+
+            var row = new DatabaseRow();
+            foreach (var c in Table.Columns)
+                row.Values[c.Name] = values.GetValueOrDefault(c.Name);
+
+            Table.Rows.Add(row);
+            Table.RowCount++;
+            _insertedRows.Add(row);
+            _pending.Inserts.Add(new PendingInsert { Row = row, Values = values });
+
+            if (!_historyReplay)
+                PushAction(new EditorAction(
+                    () => UndoInsert(row),
+                    () => RedoInsert(row, values)
+                ));
+
+            _showInsert = false;
+            _insert.Clear();
+            await InvokeAsync(StateHasChanged);
+        }
+        catch (Exception ex)
+        {
+            await OnError.InvokeAsync(ex.Message);
+        }
+    }
+
+    private void UndoInsert(DatabaseRow row)
+    {
+        var ins = _pending.Inserts.FirstOrDefault(x => x.Row == row);
+        if (ins is not null) _pending.Inserts.Remove(ins);
+        _insertedRows.Remove(row);
+        Table.Rows.Remove(row);
+        Table.RowCount = Math.Max(0, Table.RowCount - 1);
+    }
+
+    private void RedoInsert(DatabaseRow row, Dictionary<string, object?> values)
+    {
+        if (Table.Rows.Contains(row)) return;
+        foreach (var p in values)
+            row.Values[p.Key] = p.Value;
+        Table.Rows.Add(row);
+        Table.RowCount++;
+        _insertedRows.Add(row);
+        _pending.Inserts.Add(new PendingInsert { Row = row, Values = values });
+    }
+
+    // =============================================================
+    // STATE HELPERS
+    // =============================================================
+    private bool IsChanged(DatabaseRow r, DatabaseColumn c) =>
+        _pending.Updates.Any(x => x.Row == r && x.Column.Name.Equals(c.Name, StringComparison.OrdinalIgnoreCase));
+
+    private bool IsInserted(DatabaseRow r) => _insertedRows.Contains(r);
+    private bool IsDeleted(DatabaseRow r) => _deletedRows.Contains(r);
+
+    private static bool ValuesEqual(object? a, object? b) =>
+        a is byte[] ab && b is byte[] bb ? ab.SequenceEqual(bb) : Equals(a, b);
+
+    private static bool IsNotNullViolation(DatabaseColumn c, object? value) =>
+        c.IsNotNull && value is null;
+
+    // =============================================================
+    // TYPE DETECTION
+    // =============================================================
+    private static bool IsBoolean(DatabaseColumn c) =>
+        c.DataType.Contains("BOOL", StringComparison.OrdinalIgnoreCase) ||
+        c.Name.StartsWith("is_", StringComparison.OrdinalIgnoreCase) ||
+        c.Name.StartsWith("has_", StringComparison.OrdinalIgnoreCase);
+
+    private static bool IsDate(DatabaseColumn c) =>
+        c.DataType.Contains("DATE", StringComparison.OrdinalIgnoreCase) ||
+        c.DataType.Contains("TIME", StringComparison.OrdinalIgnoreCase) ||
+        c.Name.Contains("date", StringComparison.OrdinalIgnoreCase) ||
+        c.Name.Contains("time", StringComparison.OrdinalIgnoreCase);
+
+    private static bool IsNumber(DatabaseColumn c)
+    {
+        var t = c.DataType.ToUpperInvariant();
+        return t.Contains("INT") || t.Contains("REAL") || t.Contains("FLOA") ||
+               t.Contains("DOUB") || t.Contains("NUM") || t.Contains("DEC");
+    }
+
+    private static bool IsJsonColumn(DatabaseColumn c, object? value)
+    {
+        if (c.DataType.Contains("JSON", StringComparison.OrdinalIgnoreCase) ||
+            c.Name.Contains("json", StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (value is string s)
+        {
+            s = s.Trim();
+            return (s.StartsWith("{") && s.EndsWith("}")) ||
+                   (s.StartsWith("[") && s.EndsWith("]"));
+        }
+
+        return false;
+    }
+
+    private static bool IsTrue(object? v) =>
+        v is true ||
+        v is long l && l != 0 ||
+        v is int i && i != 0 ||
+        string.Equals(v?.ToString(), "true", StringComparison.OrdinalIgnoreCase) ||
+        v?.ToString() == "1";
+
+    // =============================================================
+    // EDITOR HELPERS
+    // =============================================================
+    private static string GetEditorKind(DatabaseColumn c, object? v) =>
+        v is byte[] ? "blob" :
+        IsBoolean(c) ? "bool" :
+        IsJsonColumn(c, v) ? "json" :
+        IsDate(c) ? "date" :
+        IsNumber(c) ? "number" :
+        "text";
+
+    private static string ToEditorText(object? v, DatabaseColumn c)
+    {
+        if (v is null) return "";
+        if (v is byte[] b) return Convert.ToBase64String(b);
+        if (IsBoolean(c)) return IsTrue(v) ? "true" : "false";
+        if (IsDate(c) && DateTime.TryParse(v.ToString(), out var dt))
+            return dt.ToString("yyyy-MM-ddTHH:mm");
+        if (IsJsonColumn(c, v) && v is string s)
+        {
+            try
+            {
+                return JsonSerializer.Serialize(JsonDocument.Parse(s).RootElement,
+                    new JsonSerializerOptions { WriteIndented = true });
+            }
+            catch { return s; }
+        }
+        return v.ToString() ?? "";
+    }
+
+    private static object? ConvertFromText(string text, DatabaseColumn c, object? existing)
+    {
+        if (string.IsNullOrWhiteSpace(text)) return null;
+
+        if (existing is byte[])
+        {
+            try { return Convert.FromBase64String(text); }
+            catch { throw new FormatException($"'{c.Name}' expects valid Base64 BLOB data."); }
+        }
+
+        if (IsBoolean(c))
+        {
+            if (bool.TryParse(text, out var b)) return b ? 1L : 0L;
+            if (text == "1") return 1L;
+            if (text == "0") return 0L;
+            throw new FormatException($"'{c.Name}' expects TRUE/FALSE.");
+        }
+
+        var t = c.DataType.ToUpperInvariant();
+
+        if (t.Contains("INT"))
+        {
+            if (long.TryParse(text, NumberStyles.Integer, CultureInfo.InvariantCulture, out var i))
+                return i;
+            throw new FormatException($"'{c.Name}' expects an integer.");
+        }
+
+        if (t.Contains("REAL") || t.Contains("FLOA") || t.Contains("DOUB") || t.Contains("NUM") || t.Contains("DEC"))
+        {
+            if (double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out var d))
+                return d;
+            throw new FormatException($"'{c.Name}' expects a number.");
+        }
+
+        if (IsDate(c))
+        {
+            if (DateTime.TryParse(text, CultureInfo.InvariantCulture,
+                DateTimeStyles.AllowWhiteSpaces | DateTimeStyles.AssumeLocal, out var dt))
+                return dt.ToString("O", CultureInfo.InvariantCulture);
+            throw new FormatException($"'{c.Name}' expects a valid date/time.");
+        }
+
+        if (IsJsonColumn(c, text))
+        {
+            try { JsonDocument.Parse(text); }
+            catch { throw new FormatException($"'{c.Name}' contains invalid JSON."); }
+        }
+
+        return text;
+    }
+
+    private string GetDateValue(string columnName)
+    {
+        if (_insert.TryGetValue(columnName, out var val) && 
+            DateTime.TryParse(val, out var dt))
+        {
+            return dt.ToString("yyyy-MM-ddTHH:mm");
+        }
+        return "";
+    }
+
+    private void SetDateValue(string columnName, string value)
+    {
+        if (DateTime.TryParse(value, out var dt))
+        {
+            _insert[columnName] = dt.ToString("yyyy-MM-ddTHH:mm");
+        }
+        else
+        {
+            _insert[columnName] = value;
+        }
+    }
+
+    // =============================================================
+    // RENDER HELPERS
+    // =============================================================
+    private static RenderFragment RenderCell(DatabaseColumn c, object? value) => builder =>
+    {
+        var seq = 0;
+
+        if (value is null)
+        {
+            builder.OpenElement(seq++, "span");
+            builder.AddAttribute(seq++, "class", "null-value");
+            builder.AddContent(seq++, "NULL");
+            builder.CloseElement();
+            return;
+        }
+
+        if (value is byte[] b)
+        {
+            builder.OpenElement(seq++, "span");
+            builder.AddAttribute(seq++, "class", "blob-value");
+            builder.AddContent(seq++, $"BLOB · {b.Length} bytes");
+            builder.CloseElement();
+            return;
+        }
+
+        if (IsBoolean(c))
+        {
+            builder.OpenElement(seq++, "span");
+            builder.AddAttribute(seq++, "class", "bool-value");
+            builder.AddContent(seq++, IsTrue(value) ? "TRUE" : "FALSE");
+            builder.CloseElement();
+            return;
+        }
+
+        if (IsJsonColumn(c, value))
+        {
+            builder.OpenElement(seq++, "span");
+            builder.AddAttribute(seq++, "class", "json-value");
+            builder.AddContent(seq++, "JSON · click to edit");
+            builder.CloseElement();
+            return;
+        }
+
+        builder.OpenElement(seq++, "span");
+        builder.AddAttribute(seq++, "class", "cell-value");
+        builder.AddContent(seq++, FormatValue(value));
+        builder.CloseElement();
+    };
+
+    private static string FormatValue(object v) =>
+        v switch
+        {
+            double d => d.ToString("G17", CultureInfo.InvariantCulture),
+            float f => f.ToString("G9", CultureInfo.InvariantCulture),
+            DateTime dt => dt.ToString("O", CultureInfo.InvariantCulture),
+            _ => v.ToString() ?? ""
+        };
+
+    private static string DisplayDiff(object? value) =>
+        value is null ? "NULL" :
+        value is byte[] b ? $"BLOB ({b.Length} bytes)" :
+        value.ToString() ?? "";
+
+    // =============================================================
+    // RECORD TYPES
+    // =============================================================
+    private sealed record EditorAction(Action Undo, Action Redo);
 }

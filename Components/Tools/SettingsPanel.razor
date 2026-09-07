@@ -1,0 +1,160 @@
+﻿@using GameSaveEditor.Models
+@inject AppSettingsService Settings
+@inject BackupService BackupService
+@inject ProfileService Profiles
+
+<div class="settings-panel">
+
+    <!-- ============================================================== -->
+    <!-- HEADER -->
+    <!-- ============================================================== -->
+    <div class="manager-toolbar">
+        <div>
+            <div class="eyebrow">APPLICATION</div>
+            <h3>Settings</h3>
+            <p class="manager-subtitle">Control backup storage and retention.</p>
+        </div>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- BACKUP STORAGE -->
+    <!-- ============================================================== -->
+    <div class="settings-section">
+        <h3>Backup storage</h3>
+
+        <label class="field-label">Location</label>
+        <select class="text-input" @bind="_mode">
+            <option value="Application">Application folder — recommended</option>
+            <option value="Custom">Custom folder</option>
+        </select>
+
+        @if (_mode == "Custom")
+        {
+            <input class="text-input settings-input" @bind="_custom" placeholder="D:\\GameBackups" />
+        }
+
+        <div class="settings-note">
+            Default: <code>@BackupService.BackupDirectory</code>
+        </div>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- RETENTION -->
+    <!-- ============================================================== -->
+    <div class="settings-section">
+        <h3>Retention</h3>
+
+        <label class="checkbox-row">
+            <input type="checkbox" @bind="_autoDelete" />
+            <span>Automatically delete backups beyond the retention limit</span>
+        </label>
+
+        <div class="retention-row">
+            <label class="field-label">Keep backups</label>
+            <input class="text-input small-input" type="number" min="1" max="1000" @bind="_retention" />
+            <span>per database</span>
+        </div>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- RESTORE SAFETY -->
+    <!-- ============================================================== -->
+    <div class="settings-section">
+        <h3>Restore safety</h3>
+
+        <label class="checkbox-row">
+            <input type="checkbox" @bind="_confirmRestore" />
+            <span>Require confirmation before restoring a backup</span>
+        </label>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- ENCRYPTION KEYS -->
+    <!-- ============================================================== -->
+    <div class="settings-section">
+        <h3>Encryption keys</h3>
+
+        <p class="settings-note">
+            Remembered keys are encrypted with Windows DPAPI and are tied to this Windows user account.
+            They are stored separately from database profiles.
+        </p>
+
+        <button class="btn btn-secondary" @onclick="ClearStoredKeys">
+            Forget all remembered keys
+        </button>
+
+        @if (_keysCleared)
+        {
+            <div class="settings-saved">✓ All remembered keys were removed.</div>
+        }
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- SAVE ACTIONS -->
+    <!-- ============================================================== -->
+    <div class="modal-actions">
+        <button class="btn btn-primary" @onclick="Save">Save settings</button>
+    </div>
+
+    @if (_saved)
+    {
+        <div class="settings-saved">✓ Settings saved.</div>
+    }
+
+</div>
+
+<!-- ============================================================== -->
+<!-- CODE BLOCK -->
+<!-- ============================================================== -->
+@code {
+    // =============================================================
+    // FIELDS
+    // =============================================================
+    private string _mode = "Application";
+    private string _custom = "";
+    private int _retention = 30;
+    private bool _autoDelete = true;
+    private bool _confirmRestore = true;
+    private bool _saved;
+    private bool _keysCleared;
+
+    // =============================================================
+    // INITIALIZATION
+    // =============================================================
+    protected override void OnInitialized()
+    {
+        var s = Settings.Current;
+
+        _mode = s.BackupDirectoryMode;
+        _custom = s.CustomBackupDirectory ?? "";
+        _retention = s.BackupRetentionCount;
+        _autoDelete = s.AutoDeleteOldBackups;
+        _confirmRestore = s.ConfirmBeforeRestore;
+    }
+
+    // =============================================================
+    // METHODS
+    // =============================================================
+    private void ClearStoredKeys()
+    {
+        Profiles.ClearStoredKeys();
+        _keysCleared = true;
+        _saved = false;
+    }
+
+    private void Save()
+    {
+        var s = Settings.Current;
+
+        s.BackupDirectoryMode = _mode;
+        s.CustomBackupDirectory = _custom;
+        s.BackupRetentionCount = Math.Clamp(_retention, 1, 1000);
+        s.AutoDeleteOldBackups = _autoDelete;
+        s.ConfirmBeforeRestore = _confirmRestore;
+
+        Settings.Save();
+        BackupService.SetSettings(s);
+
+        _saved = true;
+    }
+}

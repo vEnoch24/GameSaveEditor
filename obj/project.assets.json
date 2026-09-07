@@ -920,6 +920,22 @@
           "lib/net6.0/SQLitePCLRaw.provider.e_sqlcipher.dll": {}
         }
       },
+      "System.Security.Cryptography.ProtectedData/10.0.11": {
+        "type": "package",
+        "compile": {
+          "lib/net10.0/System.Security.Cryptography.ProtectedData.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net10.0/System.Security.Cryptography.ProtectedData.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net8.0/_._": {}
+        }
+      },
       "Xamarin.Android.Glide/4.16.0.14": {
         "type": "package",
         "dependencies": {
@@ -3829,6 +3845,22 @@
         },
         "runtime": {
           "lib/net6.0/SQLitePCLRaw.provider.e_sqlcipher.dll": {}
+        }
+      },
+      "System.Security.Cryptography.ProtectedData/10.0.11": {
+        "type": "package",
+        "compile": {
+          "lib/net10.0/System.Security.Cryptography.ProtectedData.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net10.0/System.Security.Cryptography.ProtectedData.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net8.0/_._": {}
         }
       },
       "Xamarin.Android.Glide/4.16.0.14": {
@@ -6742,6 +6774,22 @@
           "lib/net6.0/SQLitePCLRaw.provider.e_sqlcipher.dll": {}
         }
       },
+      "System.Security.Cryptography.ProtectedData/10.0.11": {
+        "type": "package",
+        "compile": {
+          "lib/net10.0/System.Security.Cryptography.ProtectedData.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net10.0/System.Security.Cryptography.ProtectedData.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net8.0/_._": {}
+        }
+      },
       "Xamarin.Android.Glide/4.16.0.14": {
         "type": "package",
         "dependencies": {
@@ -9651,6 +9699,22 @@
         },
         "runtime": {
           "lib/net6.0/SQLitePCLRaw.provider.e_sqlcipher.dll": {}
+        }
+      },
+      "System.Security.Cryptography.ProtectedData/10.0.11": {
+        "type": "package",
+        "compile": {
+          "lib/net10.0/System.Security.Cryptography.ProtectedData.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net10.0/System.Security.Cryptography.ProtectedData.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net8.0/_._": {}
         }
       },
       "Xamarin.Android.Glide/4.16.0.14": {
@@ -12564,6 +12628,22 @@
           "lib/net6.0/SQLitePCLRaw.provider.e_sqlcipher.dll": {}
         }
       },
+      "System.Security.Cryptography.ProtectedData/10.0.11": {
+        "type": "package",
+        "compile": {
+          "lib/net10.0/System.Security.Cryptography.ProtectedData.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net10.0/System.Security.Cryptography.ProtectedData.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net8.0/_._": {}
+        }
+      },
       "Xamarin.Android.Glide/4.16.0.14": {
         "type": "package",
         "dependencies": {
@@ -15475,6 +15555,22 @@
           "lib/net6.0/SQLitePCLRaw.provider.e_sqlcipher.dll": {}
         }
       },
+      "System.Security.Cryptography.ProtectedData/10.0.11": {
+        "type": "package",
+        "compile": {
+          "lib/net10.0/System.Security.Cryptography.ProtectedData.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net10.0/System.Security.Cryptography.ProtectedData.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net8.0/_._": {}
+        }
+      },
       "Xamarin.Android.Glide/4.16.0.14": {
         "type": "package",
         "dependencies": {
@@ -18363,6 +18459,22 @@
             "related": ".xml"
           }
         }
+      },
+      "System.Security.Cryptography.ProtectedData/10.0.11": {
+        "type": "package",
+        "compile": {
+          "lib/net10.0/System.Security.Cryptography.ProtectedData.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net10.0/System.Security.Cryptography.ProtectedData.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net8.0/_._": {}
+        }
       }
     },
     "net10.0-ios/android-arm64": {
@@ -19260,6 +19372,22 @@
           "ref/net6.0/System.Runtime.InteropServices.dll": {
             "related": ".xml"
           }
+        }
+      },
+      "System.Security.Cryptography.ProtectedData/10.0.11": {
+        "type": "package",
+        "compile": {
+          "lib/net10.0/System.Security.Cryptography.ProtectedData.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net10.0/System.Security.Cryptography.ProtectedData.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net8.0/_._": {}
         }
       }
     },
@@ -20159,6 +20287,22 @@
             "related": ".xml"
           }
         }
+      },
+      "System.Security.Cryptography.ProtectedData/10.0.11": {
+        "type": "package",
+        "compile": {
+          "lib/net10.0/System.Security.Cryptography.ProtectedData.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net10.0/System.Security.Cryptography.ProtectedData.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net8.0/_._": {}
+        }
       }
     },
     "net10.0-ios/iossimulator-x64": {
@@ -21056,6 +21200,22 @@
           "ref/net6.0/System.Runtime.InteropServices.dll": {
             "related": ".xml"
           }
+        }
+      },
+      "System.Security.Cryptography.ProtectedData/10.0.11": {
+        "type": "package",
+        "compile": {
+          "lib/net10.0/System.Security.Cryptography.ProtectedData.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net10.0/System.Security.Cryptography.ProtectedData.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net8.0/_._": {}
         }
       }
     },
@@ -21955,6 +22115,22 @@
             "related": ".xml"
           }
         }
+      },
+      "System.Security.Cryptography.ProtectedData/10.0.11": {
+        "type": "package",
+        "compile": {
+          "lib/net10.0/System.Security.Cryptography.ProtectedData.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net10.0/System.Security.Cryptography.ProtectedData.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net8.0/_._": {}
+        }
       }
     },
     "net10.0-ios/win-x64": {
@@ -22852,6 +23028,22 @@
           "ref/net6.0/System.Runtime.InteropServices.dll": {
             "related": ".xml"
           }
+        }
+      },
+      "System.Security.Cryptography.ProtectedData/10.0.11": {
+        "type": "package",
+        "compile": {
+          "lib/net10.0/System.Security.Cryptography.ProtectedData.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net10.0/System.Security.Cryptography.ProtectedData.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net8.0/_._": {}
         }
       }
     },
@@ -23833,6 +24025,22 @@
         "runtime": {
           "lib/net6.0/SQLitePCLRaw.provider.e_sqlcipher.dll": {}
         }
+      },
+      "System.Security.Cryptography.ProtectedData/10.0.11": {
+        "type": "package",
+        "compile": {
+          "lib/net10.0/System.Security.Cryptography.ProtectedData.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net10.0/System.Security.Cryptography.ProtectedData.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net8.0/_._": {}
+        }
       }
     },
     "net10.0-maccatalyst/android-arm64": {
@@ -24721,6 +24929,22 @@
         },
         "runtime": {
           "lib/net6.0/SQLitePCLRaw.provider.e_sqlcipher.dll": {}
+        }
+      },
+      "System.Security.Cryptography.ProtectedData/10.0.11": {
+        "type": "package",
+        "compile": {
+          "lib/net10.0/System.Security.Cryptography.ProtectedData.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net10.0/System.Security.Cryptography.ProtectedData.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net8.0/_._": {}
         }
       }
     },
@@ -25611,6 +25835,22 @@
         "runtime": {
           "lib/net6.0/SQLitePCLRaw.provider.e_sqlcipher.dll": {}
         }
+      },
+      "System.Security.Cryptography.ProtectedData/10.0.11": {
+        "type": "package",
+        "compile": {
+          "lib/net10.0/System.Security.Cryptography.ProtectedData.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net10.0/System.Security.Cryptography.ProtectedData.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net8.0/_._": {}
+        }
       }
     },
     "net10.0-maccatalyst/iossimulator-x64": {
@@ -26496,6 +26736,22 @@
         },
         "runtime": {
           "lib/net6.0/SQLitePCLRaw.provider.e_sqlcipher.dll": {}
+        }
+      },
+      "System.Security.Cryptography.ProtectedData/10.0.11": {
+        "type": "package",
+        "compile": {
+          "lib/net10.0/System.Security.Cryptography.ProtectedData.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net10.0/System.Security.Cryptography.ProtectedData.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net8.0/_._": {}
         }
       }
     },
@@ -27386,6 +27642,22 @@
         "runtime": {
           "lib/net6.0/SQLitePCLRaw.provider.e_sqlcipher.dll": {}
         }
+      },
+      "System.Security.Cryptography.ProtectedData/10.0.11": {
+        "type": "package",
+        "compile": {
+          "lib/net10.0/System.Security.Cryptography.ProtectedData.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net10.0/System.Security.Cryptography.ProtectedData.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net8.0/_._": {}
+        }
       }
     },
     "net10.0-maccatalyst/win-x64": {
@@ -28274,6 +28546,22 @@
         },
         "runtime": {
           "lib/net6.0/SQLitePCLRaw.provider.e_sqlcipher.dll": {}
+        }
+      },
+      "System.Security.Cryptography.ProtectedData/10.0.11": {
+        "type": "package",
+        "compile": {
+          "lib/net10.0/System.Security.Cryptography.ProtectedData.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net10.0/System.Security.Cryptography.ProtectedData.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net8.0/_._": {}
         }
       }
     },
@@ -29506,6 +29794,22 @@
         "runtime": {
           "lib/net6.0-windows7.0/SQLitePCLRaw.provider.e_sqlcipher.dll": {}
         }
+      },
+      "System.Security.Cryptography.ProtectedData/10.0.11": {
+        "type": "package",
+        "compile": {
+          "lib/net10.0/System.Security.Cryptography.ProtectedData.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net10.0/System.Security.Cryptography.ProtectedData.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net8.0/_._": {}
+        }
       }
     },
     "net10.0-windows10.0.19041.0/android-arm64": {
@@ -30583,6 +30887,22 @@
         },
         "runtime": {
           "lib/net6.0-windows7.0/SQLitePCLRaw.provider.e_sqlcipher.dll": {}
+        }
+      },
+      "System.Security.Cryptography.ProtectedData/10.0.11": {
+        "type": "package",
+        "compile": {
+          "lib/net10.0/System.Security.Cryptography.ProtectedData.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net10.0/System.Security.Cryptography.ProtectedData.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net8.0/_._": {}
         }
       }
     },
@@ -31662,6 +31982,22 @@
         "runtime": {
           "lib/net6.0-windows7.0/SQLitePCLRaw.provider.e_sqlcipher.dll": {}
         }
+      },
+      "System.Security.Cryptography.ProtectedData/10.0.11": {
+        "type": "package",
+        "compile": {
+          "lib/net10.0/System.Security.Cryptography.ProtectedData.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net10.0/System.Security.Cryptography.ProtectedData.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net8.0/_._": {}
+        }
       }
     },
     "net10.0-windows10.0.19041.0/iossimulator-x64": {
@@ -32736,6 +33072,22 @@
         },
         "runtime": {
           "lib/net6.0-windows7.0/SQLitePCLRaw.provider.e_sqlcipher.dll": {}
+        }
+      },
+      "System.Security.Cryptography.ProtectedData/10.0.11": {
+        "type": "package",
+        "compile": {
+          "lib/net10.0/System.Security.Cryptography.ProtectedData.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net10.0/System.Security.Cryptography.ProtectedData.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net8.0/_._": {}
         }
       }
     },
@@ -33814,6 +34166,22 @@
         },
         "runtime": {
           "lib/net6.0-windows7.0/SQLitePCLRaw.provider.e_sqlcipher.dll": {}
+        }
+      },
+      "System.Security.Cryptography.ProtectedData/10.0.11": {
+        "type": "package",
+        "compile": {
+          "lib/net10.0/System.Security.Cryptography.ProtectedData.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net10.0/System.Security.Cryptography.ProtectedData.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net8.0/_._": {}
         }
       }
     },
@@ -34902,6 +35270,22 @@
         },
         "runtime": {
           "lib/net6.0-windows7.0/SQLitePCLRaw.provider.e_sqlcipher.dll": {}
+        }
+      },
+      "System.Security.Cryptography.ProtectedData/10.0.11": {
+        "type": "package",
+        "compile": {
+          "lib/net10.0/System.Security.Cryptography.ProtectedData.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net10.0/System.Security.Cryptography.ProtectedData.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net8.0/_._": {}
         }
       }
     }
@@ -37628,6 +38012,41 @@
         "useSharedDesignerContext.txt"
       ]
     },
+    "System.Security.Cryptography.ProtectedData/10.0.11": {
+      "sha512": "PNoxCTPb+Tlux+GJyq4c89ddYdpioVSqfGx8pqOF6shCSKwUNNctXhQtRkCICjbJmGrJJsW8NY52kVYO/b8mlQ==",
+      "type": "package",
+      "path": "system.security.cryptography.protecteddata/10.0.11",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "PACKAGE.md",
+        "THIRD-PARTY-NOTICES.TXT",
+        "buildTransitive/net461/System.Security.Cryptography.ProtectedData.targets",
+        "buildTransitive/net462/_._",
+        "buildTransitive/net8.0/_._",
+        "buildTransitive/netcoreapp2.0/System.Security.Cryptography.ProtectedData.targets",
+        "lib/MonoAndroid10/_._",
+        "lib/MonoTouch10/_._",
+        "lib/net10.0/System.Security.Cryptography.ProtectedData.dll",
+        "lib/net10.0/System.Security.Cryptography.ProtectedData.xml",
+        "lib/net462/System.Security.Cryptography.ProtectedData.dll",
+        "lib/net462/System.Security.Cryptography.ProtectedData.xml",
+        "lib/net8.0/System.Security.Cryptography.ProtectedData.dll",
+        "lib/net8.0/System.Security.Cryptography.ProtectedData.xml",
+        "lib/net9.0/System.Security.Cryptography.ProtectedData.dll",
+        "lib/net9.0/System.Security.Cryptography.ProtectedData.xml",
+        "lib/netstandard2.0/System.Security.Cryptography.ProtectedData.dll",
+        "lib/netstandard2.0/System.Security.Cryptography.ProtectedData.xml",
+        "lib/xamarinios10/_._",
+        "lib/xamarinmac20/_._",
+        "lib/xamarintvos10/_._",
+        "lib/xamarinwatchos10/_._",
+        "system.security.cryptography.protecteddata.10.0.11.nupkg.sha512",
+        "system.security.cryptography.protecteddata.nuspec",
+        "useSharedDesignerContext.txt"
+      ]
+    },
     "Xamarin.Android.Glide/4.16.0.14": {
       "sha512": "zoo2thzoKv5SuY9PeB3Iaf41L7P4Z0jyPRMLUrb5u35KPHgWyQvj9hBablvtaFXuZIMMYyctwkHJwc4a4NPEKA==",
       "type": "package",
@@ -40014,7 +40433,8 @@
       "Microsoft.Extensions.Logging.Debug >= 10.0.0",
       "Microsoft.Maui.Controls >= 10.0.20",
       "Microsoft.NET.ILLink.Tasks >= 10.0.11",
-      "SQLitePCLRaw.bundle_e_sqlcipher >= 2.1.11"
+      "SQLitePCLRaw.bundle_e_sqlcipher >= 2.1.11",
+      "System.Security.Cryptography.ProtectedData >= 10.0.11"
     ],
     "net10.0-ios": [
       "Microsoft.AspNetCore.Components.WebView.Maui >= 10.0.20",
@@ -40022,7 +40442,8 @@
       "Microsoft.Extensions.Logging.Debug >= 10.0.0",
       "Microsoft.Maui.Controls >= 10.0.20",
       "Microsoft.NET.ILLink.Tasks >= 10.0.11",
-      "SQLitePCLRaw.bundle_e_sqlcipher >= 2.1.11"
+      "SQLitePCLRaw.bundle_e_sqlcipher >= 2.1.11",
+      "System.Security.Cryptography.ProtectedData >= 10.0.11"
     ],
     "net10.0-maccatalyst": [
       "Microsoft.AspNetCore.Components.WebView.Maui >= 10.0.20",
@@ -40030,14 +40451,16 @@
       "Microsoft.Extensions.Logging.Debug >= 10.0.0",
       "Microsoft.Maui.Controls >= 10.0.20",
       "Microsoft.NET.ILLink.Tasks >= 10.0.11",
-      "SQLitePCLRaw.bundle_e_sqlcipher >= 2.1.11"
+      "SQLitePCLRaw.bundle_e_sqlcipher >= 2.1.11",
+      "System.Security.Cryptography.ProtectedData >= 10.0.11"
     ],
     "net10.0-windows10.0.19041.0": [
       "Microsoft.AspNetCore.Components.WebView.Maui >= 10.0.20",
       "Microsoft.Data.Sqlite.Core >= 10.0.11",
       "Microsoft.Extensions.Logging.Debug >= 10.0.0",
       "Microsoft.Maui.Controls >= 10.0.20",
-      "SQLitePCLRaw.bundle_e_sqlcipher >= 2.1.11"
+      "SQLitePCLRaw.bundle_e_sqlcipher >= 2.1.11",
+      "System.Security.Cryptography.ProtectedData >= 10.0.11"
     ]
   },
   "packageFolders": {
@@ -40137,6 +40560,10 @@
           "SQLitePCLRaw.bundle_e_sqlcipher": {
             "target": "Package",
             "version": "[2.1.11, )"
+          },
+          "System.Security.Cryptography.ProtectedData": {
+            "target": "Package",
+            "version": "[10.0.11, )"
           }
         },
         "imports": [
@@ -40466,6 +40893,10 @@
           "SQLitePCLRaw.bundle_e_sqlcipher": {
             "target": "Package",
             "version": "[2.1.11, )"
+          },
+          "System.Security.Cryptography.ProtectedData": {
+            "target": "Package",
+            "version": "[10.0.11, )"
           }
         },
         "imports": [
@@ -40795,6 +41226,10 @@
           "SQLitePCLRaw.bundle_e_sqlcipher": {
             "target": "Package",
             "version": "[2.1.11, )"
+          },
+          "System.Security.Cryptography.ProtectedData": {
+            "target": "Package",
+            "version": "[10.0.11, )"
           }
         },
         "imports": [
@@ -41119,6 +41554,10 @@
           "SQLitePCLRaw.bundle_e_sqlcipher": {
             "target": "Package",
             "version": "[2.1.11, )"
+          },
+          "System.Security.Cryptography.ProtectedData": {
+            "target": "Package",
+            "version": "[10.0.11, )"
           }
         },
         "imports": [

@@ -1,0 +1,235 @@
+﻿@using GameSaveEditor.Models
+@using GameSaveEditor.Services
+@using Microsoft.AspNetCore.Components.Web
+@inject DatabaseProbeService Probe
+@inject ProfileService Profiles
+@inject DatabaseService Database
+@inject AppSettingsService Settings
+
+<div class="open-wizard">
+    <div class="wizard-steps">
+        <div class="wizard-step @(Step >= 1 ? "active" : "")"><span>1</span><div><strong>Database</strong><small>Choose a save file</small></div></div>
+        <div class="wizard-line"></div>
+        <div class="wizard-step @(Step >= 2 ? "active" : "")"><span>2</span><div><strong>Profile</strong><small>Choose encryption</small></div></div>
+        <div class="wizard-line"></div>
+        <div class="wizard-step @(Step >= 3 ? "active" : "")"><span>3</span><div><strong>Verify</strong><small>Test the key</small></div></div>
+    </div>
+
+    @if (Step == 1)
+    {
+        <div class="wizard-panel">
+            <div class="eyebrow">STEP 1 · DATABASE</div>
+            <h2>Choose a database</h2>
+            <p class="modal-description">Select a game save database. The editor checks the file header first so you do not have to guess whether it is ordinary SQLite or encrypted.</p>
+            <div class="path-picker-row"><input class="text-input" value="@Path" readonly placeholder="No database selected" /><button class="btn btn-secondary" @onclick="PickDatabaseAsync">Browse…</button></div>
+            @if (ProbeResult is not null)
+            {
+                <div class="probe-card @(ProbeResult.Format == DatabaseFormatKind.PlainSQLite ? "probe-good" : "probe-warning")">
+                    <div class="probe-icon">@(ProbeResult.Format == DatabaseFormatKind.PlainSQLite ? "✓" : "?")</div>
+                    <div><strong>@(ProbeResult.Format == DatabaseFormatKind.PlainSQLite ? "Plain SQLite detected" : "Encrypted or non-standard SQLite")</strong><span>@ProbeResult.Summary</span><small>@FormatBytes(ProbeResult.SizeBytes)</small></div>
+                </div>
+            }
+            <div class="wizard-actions"><button class="btn btn-secondary" @onclick="() => OnCancel.InvokeAsync()">Cancel</button><button class="btn btn-primary" disabled="@string.IsNullOrWhiteSpace(Path)" @onclick="NextToProfile">Continue</button></div>
+        </div>
+    }
+    else if (Step == 2)
+    {
+        <div class="wizard-panel">
+            <div class="eyebrow">STEP 2 · PROFILE</div>
+            <h2>Select the database format</h2>
+            <p class="modal-description">Profiles describe how a game's save database is opened. Keys can be remembered securely between sessions using Windows DPAPI. They are never written to profiles.json.</p>
+            <label class="field-label">Database profile</label>
+            <select class="text-input" @bind="ProfileId">
+                @foreach (var p in Profiles.All)
+                {
+                    <option value="@p.Id">@p.Name</option>
+                }
+            </select>
+            <div class="profile-description"><strong>@SelectedProfile.Name</strong><br />@SelectedProfile.Description</div>
+            @if (SelectedProfile.UsesPassphrase)
+            {
+                <label class="field-label">Key / passphrase</label>
+                <input class="text-input" type="password" autocomplete="off" @bind="Key" @bind:event="oninput" @onkeydown="HandleKeyDown" placeholder="Enter the key supplied by the game/tool documentation" />
+                @if (!string.IsNullOrEmpty(SessionHint))
+                {
+                    <div class="session-key-hint">✓ @SessionHint</div>
+                }
+                <label class="checkbox-row"><input type="checkbox" @bind="RememberKey" /><span>Remember this key securely on this Windows account</span></label>
+            }
+            <div class="profile-compatibility"><span class="compat-dot"></span><strong>Provider:</strong> bundled SQLCipher 4 native provider</div>
+            <div class="wizard-actions"><button class="btn btn-secondary" @onclick="() => Step = 1">Back</button><button class="btn btn-primary" disabled="@(SelectedProfile.UsesPassphrase && string.IsNullOrWhiteSpace(Key))" @onclick="NextToVerify">Test configuration</button></div>
+        </div>
+    }
+    else
+    {
+        <div class="wizard-panel">
+            <div class="eyebrow">STEP 3 · VERIFY</div>
+            <h2>Verify access before opening</h2>
+            <p class="modal-description">The editor will open a separate read-only connection and run a SQLite metadata query. This does not modify the selected database.</p>
+            <div class="verify-summary"><div><span>DATABASE</span><strong>@Path</strong></div><div><span>PROFILE</span><strong>@SelectedProfile.Name</strong></div><div><span>ENCRYPTION</span><strong>@SelectedProfile.Encryption</strong></div></div>
+            @if (_testing)
+            {
+                <div class="test-status"><span class="spinner"></span>Testing profile and key…</div>
+            }
+            @if (_testResult is not null)
+            {
+                <div class="test-status @(_testSucceeded ? "test-success" : "test-failure")"><span>@(_testSucceeded ? "✓" : "!")</span>@_testResult</div>
+            }
+            <div class="wizard-actions"><button class="btn btn-secondary" disabled="@_testing" @onclick="() => Step = 2">Back</button><button class="btn btn-secondary" disabled="@_testing" @onclick="TestAsync">Test again</button><button class="btn btn-primary" disabled="@(_testing || !_testSucceeded)" @onclick="OpenAsync">Open database</button></div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string? InitialPath
+    {
+        get; set;
+    }
+    [Parameter]
+    public string? InitialProfileId
+    {
+        get; set;
+    }
+    [Parameter]
+    public EventCallback OnCancel
+    {
+        get; set;
+    }
+    [Parameter]
+    public EventCallback<string> OnOpened
+    {
+        get; set;
+    }
+    [Parameter]
+    public EventCallback<string> OnError
+    {
+        get; set;
+    }
+    private int Step = 1;
+    private string Path = "";
+    private string ProfileId = "sqlcipher4";
+    private string Key = "";
+    private bool _testing, _testSucceeded;
+    private string? _testResult;
+    private DatabaseProbeResult? ProbeResult;
+    private string? SessionHint;
+    private bool RememberKey = true;
+    private DatabaseProfile SelectedProfile => Profiles.Find(ProfileId) ?? DatabaseProfile.BuiltIns.First(x => x.Id == "sqlcipher4");
+
+    protected override void OnInitialized()
+    {
+        if (!string.IsNullOrWhiteSpace(InitialPath) && File.Exists(InitialPath))
+        {
+            Path = InitialPath!;
+            ProbeResult = Probe.Probe(Path);
+        }
+        if (!string.IsNullOrWhiteSpace(InitialProfileId))
+            ProfileId = InitialProfileId!;
+        else if (ProbeResult?.Format == DatabaseFormatKind.PlainSQLite)
+            ProfileId = "plain";
+        LoadSessionKey();
+    }
+
+    private async Task PickDatabaseAsync()
+    {
+        try
+        {
+            var r = await FilePicker.Default.PickAsync(new PickOptions { PickerTitle = "Select SQLite / SQLCipher database", FileTypes = new FilePickerFileType(new Dictionary<DevicePlatform, IEnumerable<string>> { [DevicePlatform.WinUI] = new[] { ".db", ".sqlite", ".sqlite3" } }) });
+            if (r is null)
+                return;
+            Path = !string.IsNullOrWhiteSpace(r.FullPath) && File.Exists(r.FullPath) ? r.FullPath : await CopyToLocalPathAsync(r);
+            ProbeResult = Probe.Probe(Path);
+            if (ProbeResult.Format == DatabaseFormatKind.PlainSQLite)
+                ProfileId = "plain";
+            else
+                ProfileId = string.IsNullOrWhiteSpace(Settings.Current.LastProfileId) ? "sqlcipher4" : Settings.Current.LastProfileId;
+            LoadSessionKey();
+        }
+        catch (Exception ex) { await OnError.InvokeAsync(ex.Message); }
+    }
+
+    private void NextToProfile()
+    {
+        LoadSessionKey();
+        Step = 2;
+        _testResult = null;
+        _testSucceeded = false;
+    }
+    private async Task NextToVerify()
+    {
+        Step = 3;
+        await TestAsync();
+    }
+    private void LoadSessionKey()
+    {
+        if (!SelectedProfile.UsesPassphrase)
+        {
+            Key = "";
+            SessionHint = null;
+            return;
+        }
+        var session = Profiles.GetSessionKey(SelectedProfile.Id);
+        var stored = Profiles.GetStoredKey(SelectedProfile.Id);
+        Key = session ?? stored ?? "";
+        RememberKey = stored is not null;
+        SessionHint = session is not null ? "A session key is loaded." : stored is not null ? "A securely stored key was loaded from this Windows account." : null;
+    }
+
+    private async Task TestAsync()
+    {
+        _testing = true;
+        _testResult = null;
+        _testSucceeded = false;
+        try
+        {
+            if (SelectedProfile.Id is "sqlcipher3" or "sqlcipher-custom")
+                throw new NotSupportedException($"{SelectedProfile.Name} is a profile definition only in this build. The bundled native provider supports SQLCipher 4.");
+            var result = await Database.TestConnectionAsync(Path, SelectedProfile.UsesPassphrase ? Key : null, SelectedProfile);
+            _testSucceeded = result;
+            _testResult = result ? "Access verified. The database can be opened with this profile and key." : "The profile/key could not validate the database.";
+        }
+        catch (Exception ex) { _testResult = ex is Microsoft.Data.Sqlite.SqliteException ? "Access failed. Verify the key and encryption profile." : ex.Message; }
+        finally { _testing = false; StateHasChanged(); }
+    }
+
+    private async Task OpenAsync()
+    {
+        try
+        {
+            var actualKey = SelectedProfile.UsesPassphrase ? Key : null;
+            if (SelectedProfile.UsesPassphrase)
+            {
+                Profiles.SetSessionKey(SelectedProfile.Id, actualKey!);
+                if (RememberKey)
+                    Profiles.SetStoredKey(SelectedProfile.Id, actualKey!);
+                else
+                    Profiles.RemoveStoredKey(SelectedProfile.Id);
+            }
+            await Database.OpenAsync(Path, actualKey, SelectedProfile);
+            Settings.Current.LastProfileId = SelectedProfile.Id;
+            Settings.Save();
+            Profiles.MarkUsed(SelectedProfile, Path);
+            await OnOpened.InvokeAsync(Path);
+        }
+        catch (Exception ex) { await OnError.InvokeAsync(ex.Message); }
+    }
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            Step = 3;
+            await TestAsync();
+        }
+    }
+    private static string FormatBytes(long bytes) => bytes switch { >= 1024 * 1024 => $"{bytes / 1024d / 1024d:N1} MB", >= 1024 => $"{bytes / 1024d:N1} KB", _ => $"{bytes:N0} bytes" };
+    private static async Task<string> CopyToLocalPathAsync(FileResult r)
+    {
+        var d = System.IO.Path.Combine(FileSystem.CacheDirectory, $"{Guid.NewGuid():N}_{r.FileName}");
+        await using var s = await r.OpenReadAsync();
+        await using var o = File.Create(d);
+        await s.CopyToAsync(o);
+        return d;
+    }
+}

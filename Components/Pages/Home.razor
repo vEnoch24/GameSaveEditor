@@ -1,152 +1,406 @@
 ﻿@page "/"
+@using GameSaveEditor.Models
+@using GameSaveEditor.Services
+@using GameSaveEditor.Components.Tools
+
 @inject DatabaseService Database
 @inject BackupService BackupService
+@inject ProfileService Profiles
+@inject AppSettingsService Settings
+
 <PageTitle>Save Database Explorer</PageTitle>
+
 <div class="page">
+
+    <!-- ============================================================== -->
+    <!-- TOP BAR -->
+    <!-- ============================================================== -->
     <header class="topbar">
-        <div class="brand"><div class="brand-mark">DB</div><div><div class="brand-title">Save Database Explorer</div><div class="brand-subtitle">SQLite / SQLCipher database editor</div></div></div><div class="top-actions">
-        @if (Database.IsOpen)
-        {
-            <div class="connection-pill"><span class="status-dot"></span>@(Database.IsEncryptedConnection ? "Encrypted · Editable" : "SQLite · Editable")</div>
-        }
-        <button class="btn btn-secondary" @onclick="OpenDatabaseAsync">Open database</button>
-    </div>
-</header>
-@if (_message is not null)
-{
-    <div class="success-banner"><span>✓</span>@_message<button class="icon-button" @onclick="() => _message = null">×</button></div>
-}
-@if (_error is not null)
-{
-    <div class="error-banner"><div><strong>Database operation failed</strong><span>@_error</span></div><button class="icon-button" @onclick="() => _error = null">×</button></div>
-}
-<main class="workspace">
-    <aside class="sidebar">
-        <div class="sidebar-section"><div class="section-label">DATABASE</div>
-            <div class="database-card">
-
-                <div class="database-icon">▣</div>
-                <div class="database-meta">
-                    <div class="database-name">@(_databaseName ?? "No database")</div>
-                    <div class="database-path" title="@Database.DatabasePath">@(Database.IsOpen ? Database.DatabasePath : "Open a .db file to begin")</div></div>
-            </div></div><div class="sidebar-section tables-section">
-            <div class="section-heading">
-                <div class="section-label">TABLES</div>@if(Database.IsOpen){
-                                                           <span class="table-count">@Database.Tables.Count</span>
-                                                       }
-            </div>@if(!Database.IsOpen){
-                      <div class="empty-sidebar">Open a database to view its tables.</div>
-                  }else
-                  {
-
-                      <div class="table-list">
-                          @foreach (var t in Database.Tables)
-                          {
-                              <button class="table-item @(Database.SelectedTable?.Name == t.Name ? "selected" : "")" @onclick="() => SelectTableAsync(t)">
-                                  <span class="table-symbol">▦</span><span class="table-item-name">@t.Name</span><span class="row-count">@t.RowCount.ToString("N0")</span>
-                              </button>
-                          }
-                      </div>
-                  }
-        </div>
-        @if (Database.IsOpen)
-        {
-            <div class="sidebar-footer">
-                <button class="sidebar-action" @onclick="OpenDatabaseAsync"><span>＋</span> Open another database</button>
+        <div class="brand">
+            <div class="brand-mark">DB</div>
+            <div>
+                <div class="brand-title">Save Database Explorer</div>
+                <div class="brand-subtitle">Game save database editor</div>
             </div>
-        }
-</aside>
-<section class="content">
-    @if (!Database.IsOpen)
-    {
-        <div class="welcome"><div class="welcome-icon">▤</div><h2>Explore and edit a save database</h2>
-            <p>Open an SQLite/SQLCipher database, inspect its tables, edit values, and save safely with an automatic backup.</p>
-            <button class="btn btn-primary btn-large" @onclick="OpenDatabaseAsync">Open database</button><div class="hint">Keys are supplied by the user. Unknown encryption keys are not recovered or cracked.</div></div>
-    }
-    else if (Database.SelectedTable is null)
-    {
+        </div>
+        <div class="top-actions">
+            @if (Database.IsOpen)
+            {
+                <div class="connection-pill">
+                    <span class="status-dot"></span>
+                    @Database.ActiveProfile?.Name · Editable
+                </div>
+            }
+            <button class="btn btn-secondary" @onclick="ShowOpenWizard">
+                Open database
+            </button>
+        </div>
+    </header>
 
-        <div class="welcome compact"><div class="welcome-icon">▦</div><h1>Select a table</h1><p>Choose a table from the left.</p></div>
-    }
-    else
+    <!-- ============================================================== -->
+    <!-- MESSAGE BANNERS -->
+    <!-- ============================================================== -->
+    @if (_message is not null)
     {
-
-        <TableViewer Table="Database.SelectedTable" Database="Database" BackupService="BackupService" OnError="SetError" OnMessage="SetMessage" />
+        <div class="success-banner">
+            <span>✓</span> @_message
+            <button class="icon-button" @onclick="() => _message = null">×</button>
+        </div>
     }
-</section>
-</main>
-@if (_showKeyDialog)
-{
-    <div class="modal-backdrop"><div class="modal-card key-modal"><div class="modal-header"><div><div class="eyebrow">OPEN DATABASE</div><h2>Encryption key</h2></div><button class="icon-button" @onclick="CancelKeyDialog">×</button></div><p class="modal-description">Enter the database passphrase. It is used directly as the SQLCipher passphrase.</p><label class="field-label">Key / passphrase</label><input class="text-input" type="password" autocomplete="off" @bind="_pendingKey" @bind:event="oninput" @onkeydown="HandleKeyDown" /><label class="checkbox-row"><input type="checkbox" @bind="_rememberKey" /><span>Remember for this session only</span></label><div class="modal-actions"><button class="btn btn-secondary" @onclick="CancelKeyDialog">Cancel</button><button class="btn btn-primary" @onclick="OpenPendingDatabaseAsync">Open</button></div></div></div>
-}
+
+    @if (_error is not null)
+    {
+        <div class="error-banner">
+            <div>
+                <strong>Database operation failed</strong>
+                <span>@_error</span>
+            </div>
+            <button class="icon-button" @onclick="() => _error = null">×</button>
+        </div>
+    }
+
+    <!-- ============================================================== -->
+    <!-- MAIN WORKSPACE -->
+    <!-- ============================================================== -->
+    <main class="workspace">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+
+            <!-- Database Info -->
+            <div class="sidebar-section">
+                <div class="section-label">DATABASE</div>
+                <div class="database-card">
+                    <div class="database-icon">▣</div>
+                    <div class="database-meta">
+                        <div class="database-name">@(_databaseName ?? "No database")</div>
+                        <div class="database-path" title="@Database.DatabasePath">
+                            @(Database.IsOpen ? Database.DatabasePath : "Open a .db file to begin")
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tables List -->
+            <div class="sidebar-section tables-section">
+                <div class="section-heading">
+                    <div class="section-label">TABLES</div>
+                    @if (Database.IsOpen)
+                    {
+                        <span class="table-count">@Database.Tables.Count</span>
+                    }
+                </div>
+
+                @if (!Database.IsOpen)
+                {
+                    <div class="empty-sidebar">Open a database to view its tables.</div>
+                }
+                else
+                {
+                    <div class="table-list">
+                        @foreach (var t in Database.Tables)
+                        {
+                            <button class="table-item @(Database.SelectedTable?.Name == t.Name ? "selected" : "")"
+                                    @onclick="() => SelectTableAsync(t)">
+                                <span class="table-symbol">▦</span>
+                                <span class="table-item-name">@t.Name</span>
+                                <span class="row-count">@t.RowCount.ToString("N0")</span>
+                            </button>
+                        }
+                    </div>
+                }
+            </div>
+
+            <!-- Sidebar Actions -->
+            <div class="sidebar-footer">
+                @if (Database.IsOpen)
+                {
+                    <button class="sidebar-action" @onclick="ShowOpenWizard">
+                        <span>＋</span> Open another database
+                    </button>
+                }
+                <button class="sidebar-action" @onclick="() => _showProfiles = true">
+                    <span>◈</span> Database profiles
+                </button>
+                <button class="sidebar-action" @onclick="() => _showSettings = true">
+                    <span>⚙</span> Settings
+                </button>
+                @if (Database.IsOpen)
+                {
+                    <button class="sidebar-action" @onclick="() => _showBackups = true">
+                        <span>↺</span> Backup manager
+                    </button>
+                    <button class="sidebar-action" @onclick="() => _showQuery = true">
+                        <span>⌘</span> Query console
+                    </button>
+                }
+            </div>
+
+        </aside>
+
+        <!-- CONTENT AREA -->
+        <section class="content">
+
+            @if (!Database.IsOpen)
+            {
+                <!-- Welcome Screen -->
+                <div class="welcome">
+                    <div class="welcome-icon">▤</div>
+                    <h2>Explore and edit a save database</h2>
+                    <p>
+                        Open a game save, identify its format, choose a reusable profile,
+                        verify the key, then edit and save safely.
+                    </p>
+                    <button class="btn btn-primary btn-large" @onclick="ShowOpenWizard">
+                        Open database
+                    </button>
+                    <div class="hint">
+                        Profiles remember database locations and encryption configuration.
+                        Encryption keys remain in memory only.
+                    </div>
+
+                    <div class="quick-profiles">
+                        <div class="section-label">QUICK OPEN</div>
+                        @foreach (var p in Profiles.All
+                                            .Where(x => !string.IsNullOrWhiteSpace(x.DatabasePath))
+                                            .OrderByDescending(x => x.LastUsedUtc))
+                        {
+                            <button class="quick-profile" @onclick="() => OpenProfileAsync(p)">
+                                <span>◈</span>
+                                <div>
+                                    <strong>@p.Name</strong>
+                                    <small>@p.DatabasePath</small>
+                                </div>
+                            </button>
+                        }
+                    </div>
+                </div>
+            }
+            else if (Database.SelectedTable is null)
+            {
+                <!-- No Table Selected -->
+                <div class="welcome compact">
+                    <div class="welcome-icon">▦</div>
+                    <h1>Select a table</h1>
+                    <p>Choose a table from the left.</p>
+                </div>
+            }
+            else
+            {
+                <!-- Table Viewer -->
+                <TableViewer Table="Database.SelectedTable"
+                             Database="Database"
+                             BackupService="BackupService"
+                             OnError="SetError"
+                             OnMessage="SetMessage" />
+            }
+
+        </section>
+
+    </main>
+
+    <!-- ============================================================== -->
+    <!-- MODALS -->
+    <!-- ============================================================== -->
+
+    <!-- Open Database Wizard -->
+    @if (_showOpenWizard)
+    {
+        <div class="modal-backdrop">
+            <div class="modal-card wizard-modal">
+                <div class="modal-header">
+                    <div>
+                        <div class="eyebrow">OPEN DATABASE</div>
+                        <h3>Database setup wizard</h3>
+                    </div>
+                    <button class="icon-button" @onclick="CloseOpenWizard">×</button>
+                </div>
+                <OpenDatabaseWizard InitialPath="@_wizardInitialPath"
+                                    InitialProfileId="@_wizardInitialProfileId"
+                                    OnCancel="CloseOpenWizard"
+                                    OnOpened="HandleOpened"
+                                    OnError="SetError" />
+            </div>
+        </div>
+    }
+
+    <!-- Backup Manager -->
+    @if (_showBackups)
+    {
+        <div class="modal-backdrop">
+            <div class="modal-card xlarge-modal">
+                <div class="modal-header">
+                    <div>
+                        <div class="eyebrow">TOOLS</div>
+                        <h3>Backup manager</h3>
+                    </div>
+                    <button class="icon-button" @onclick="() => _showBackups = false">×</button>
+                </div>
+                <BackupManager BackupService="BackupService"
+                               DatabasePath="@Database.DatabasePath"
+                               OnRestore="RestoreBackupAsync"
+                               OnError="SetError" />
+            </div>
+        </div>
+    }
+
+    <!-- Query Console -->
+    @if (_showQuery)
+    {
+        <div class="modal-backdrop">
+            <div class="modal-card xlarge-modal">
+                <div class="modal-header">
+                    <div>
+                        <div class="eyebrow">TOOLS</div>
+                        <h3>Query console</h3>
+                    </div>
+                    <button class="icon-button" @onclick="() => _showQuery = false">×</button>
+                </div>
+                <QueryConsole Database="Database" />
+            </div>
+        </div>
+    }
+
+    <!-- Profile Manager -->
+    @if (_showProfiles)
+    {
+        <div class="modal-backdrop">
+            <div class="modal-card xlarge-modal">
+                <div class="modal-header">
+                    <div>
+                        @* <div class="eyebrow">CONFIGURATION</div>
+                        <h2>Database profiles</h2> *@
+                    </div>
+                    <button class="icon-button" @onclick="() => _showProfiles = false">×</button>
+                </div>
+                <ProfileManager />
+            </div>
+        </div>
+    }
+
+    <!-- Settings Panel -->
+    @if (_showSettings)
+    {
+        <div class="modal-backdrop">
+            <div class="modal-card wide-modal">
+                <div class="modal-header">
+                    <div>
+                    </div>
+                    <button class="icon-button" @onclick="() => _showSettings = false">×</button>
+                </div>
+                <SettingsPanel />
+            </div>
+        </div>
+    }
+
 </div>
+
+<!-- ============================================================== -->
+<!-- CODE BLOCK -->
+<!-- ============================================================== -->
 @code {
-    private string? _error, _message, _databaseName;
-    private bool _showKeyDialog, _rememberKey;
-    private string _pendingPath = "", _pendingKey = "";
-    private string? _sessionKey; protected override async Task OnInitializedAsync()
+    // =============================================================
+    // FIELDS
+    // =============================================================
+    private string? _error;
+    private string? _message;
+    private string? _databaseName;
+    private string? _wizardInitialPath;
+    private string? _wizardInitialProfileId;
+    private bool _showOpenWizard;
+    private bool _showBackups;
+    private bool _showQuery;
+    private bool _showProfiles;
+    private bool _showSettings;
+
+    // =============================================================
+    // LIFECYCLE
+    // =============================================================
+    protected override async Task OnInitializedAsync()
     {
         if (File.Exists(DatabaseConfiguration.DefaultDatabasePath))
+        {
             try
             {
-                await Database.OpenAsync(DatabaseConfiguration.DefaultDatabasePath, DatabaseConfiguration.DefaultEncryptionKey);
+                var profile = DatabaseProfile.BuiltIns.First(x => x.Id == "solo-leveling");
+                await Database.OpenAsync(
+                    DatabaseConfiguration.DefaultDatabasePath,
+                    DatabaseConfiguration.DefaultEncryptionKey,
+                    profile
+                );
+
+                Profiles.SetSessionKey(profile.Id, DatabaseConfiguration.DefaultEncryptionKey);
                 _databaseName = Path.GetFileName(Database.DatabasePath);
-                _sessionKey = DatabaseConfiguration.DefaultEncryptionKey;
+                Profiles.MarkUsed(profile, Database.DatabasePath);
             }
-            catch (Exception ex) { _error = ToUserMessage(ex); }
+            catch (Exception ex)
+            {
+                _error = ToUserMessage(ex);
+            }
+        }
     }
-    private async Task OpenDatabaseAsync()
+
+    // =============================================================
+    // WIZARD
+    // =============================================================
+    private void ShowOpenWizard()
     {
         _error = null;
-        _message = null;
+        _wizardInitialPath = null;
+        _wizardInitialProfileId = null;
+        _showOpenWizard = true;
+    }
+
+    private void CloseOpenWizard()
+    {
+        _showOpenWizard = false;
+    }
+
+    private Task HandleOpened(string path)
+    {
+        _databaseName = Path.GetFileName(path);
+        _showOpenWizard = false;
+        SetMessage($"Opened {Path.GetFileName(path)} successfully.");
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    // =============================================================
+    // PROFILE OPERATIONS
+    // =============================================================
+    private async Task OpenProfileAsync(DatabaseProfile p)
+    {
+        _error = null;
+
         try
         {
-            var r = await FilePicker.Default.PickAsync(new PickOptions { PickerTitle = "Select SQLite / SQLCipher database", FileTypes = new FilePickerFileType(new Dictionary<DevicePlatform, IEnumerable<string>> { [DevicePlatform.WinUI] = new[] { ".db", ".sqlite", ".sqlite3" } }) });
-            if (r is null)
-                return;
-            var path = await CopyToLocalPathAsync(r);
-            try
+            if (string.IsNullOrWhiteSpace(p.DatabasePath) || !File.Exists(p.DatabasePath))
             {
-                await Database.OpenAsync(path, null);
-                _databaseName = Path.GetFileName(path);
-                _sessionKey = null;
+                SetError("The profile's database path does not exist. Edit the profile and choose a valid path.");
                 return;
             }
-            catch { }
-            _pendingPath = path;
-            _pendingKey = _sessionKey ?? "";
-            _rememberKey = !string.IsNullOrEmpty(_sessionKey);
-            _showKeyDialog = true;
+
+            if (p.UsesPassphrase)
+            {
+                _wizardInitialPath = p.DatabasePath;
+                _wizardInitialProfileId = p.Id;
+                _showOpenWizard = true;
+                return;
+            }
+
+            await Database.OpenAsync(p.DatabasePath, null, p);
+            _databaseName = Path.GetFileName(p.DatabasePath);
+            SetMessage($"Opened {p.Name}.");
         }
-        catch (Exception ex) { _error = ToUserMessage(ex); }
-    }
-    private async Task OpenPendingDatabaseAsync()
-    {
-        if (string.IsNullOrWhiteSpace(_pendingKey))
+        catch (Exception ex)
         {
-            _error = "Enter a key/passphrase.";
-            return;
+            SetError(ToUserMessage(ex));
         }
-        try
-        {
-            await Database.OpenAsync(_pendingPath, _pendingKey);
-            _databaseName = Path.GetFileName(_pendingPath);
-            _sessionKey = _rememberKey ? _pendingKey : null;
-            _showKeyDialog = false;
-        }
-        catch (Exception ex) { _error = ToUserMessage(ex); }
     }
-    private void CancelKeyDialog()
-    {
-        _showKeyDialog = false;
-        _pendingKey = "";
-        _pendingPath = "";
-    }
-    private async Task HandleKeyDown(KeyboardEventArgs e)
-    {
-        if (e.Key == "Enter")
-            await OpenPendingDatabaseAsync();
-    }
+
+    // =============================================================
+    // TABLE OPERATIONS
+    // =============================================================
     private async Task SelectTableAsync(DatabaseTable t)
     {
         try
@@ -154,29 +408,66 @@
             _error = null;
             await Database.SelectTableAsync(t);
         }
-        catch (Exception ex) { _error = ToUserMessage(ex); }
+        catch (Exception ex)
+        {
+            SetError(ToUserMessage(ex));
+        }
     }
+
+    // =============================================================
+    // BACKUP OPERATIONS
+    // =============================================================
+    private async Task RestoreBackupAsync(string backupPath)
+    {
+        try
+        {
+            var path = Database.DatabasePath;
+            var key = Database.ActiveKey;
+            var profile = Database.ActiveProfile;
+
+            Database.Close();
+            await BackupService.RestoreBackupAsync(backupPath, path);
+
+            await Database.OpenAsync(
+                path,
+                key,
+                profile ?? DatabaseProfile.BuiltIns.First(x => x.Id == "plain")
+            );
+
+            _showBackups = false;
+            SetMessage($"Restored {Path.GetFileName(backupPath)}.");
+        }
+        catch (Exception ex)
+        {
+            SetError(ex.Message);
+        }
+    }
+
+    // =============================================================
+    // UI HELPERS
+    // =============================================================
     private void SetError(string m)
     {
         _error = m;
         _message = null;
         InvokeAsync(StateHasChanged);
     }
+
     private void SetMessage(string m)
     {
         _message = m;
         _error = null;
         InvokeAsync(StateHasChanged);
     }
-    private static async Task<string> CopyToLocalPathAsync(FileResult r)
+
+    private static string ToUserMessage(Exception ex)
     {
-        if (!string.IsNullOrWhiteSpace(r.FullPath) && File.Exists(r.FullPath))
-            return r.FullPath;
-        var d = Path.Combine(FileSystem.CacheDirectory, $"{Guid.NewGuid():N}_{r.FileName}");
-        await using var s = await r.OpenReadAsync();
-        await using var o = File.Create(d);
-        await s.CopyToAsync(o);
-        return d;
+        if (ex is NotSupportedException)
+            return ex.Message;
+
+        if (ex is Microsoft.Data.Sqlite.SqliteException)
+            return "SQLite could not read the database with the selected profile/key. Verify the key and encryption format.";
+
+        return ex.Message;
     }
-    private static string ToUserMessage(Exception ex) => ex is Microsoft.Data.Sqlite.SqliteException ? "SQLite could not read the database with the supplied key/settings. Verify the key and encryption format." : ex.Message;
 }

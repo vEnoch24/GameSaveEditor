@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "NZJuxvu14N8=",
+  "dgSpecHash": "XYZyXEfrkiU=",
   "success": true,
   "projectFilePath": "C:\\Users\\Enoch\\source\\repos\\GameSaveEditor\\GameSaveEditor\\GameSaveEditor.csproj",
   "expectedPackageFiles": [
@@ -60,6 +60,7 @@
     "C:\\Users\\Enoch\\.nuget\\packages\\sqlitepclraw.provider.e_sqlcipher\\2.1.11\\sqlitepclraw.provider.e_sqlcipher.2.1.11.nupkg.sha512",
     "C:\\Users\\Enoch\\.nuget\\packages\\sqlitepclraw.provider.internal\\2.1.11\\sqlitepclraw.provider.internal.2.1.11.nupkg.sha512",
     "C:\\Users\\Enoch\\.nuget\\packages\\system.runtime.interopservices.nfloat.internal\\6.0.1\\system.runtime.interopservices.nfloat.internal.6.0.1.nupkg.sha512",
+    "C:\\Users\\Enoch\\.nuget\\packages\\system.security.cryptography.protecteddata\\10.0.11\\system.security.cryptography.protecteddata.10.0.11.nupkg.sha512",
     "C:\\Users\\Enoch\\.nuget\\packages\\xamarin.android.glide\\4.16.0.14\\xamarin.android.glide.4.16.0.14.nupkg.sha512",
     "C:\\Users\\Enoch\\.nuget\\packages\\xamarin.android.glide.annotations\\4.16.0.14\\xamarin.android.glide.annotations.4.16.0.14.nupkg.sha512",
     "C:\\Users\\Enoch\\.nuget\\packages\\xamarin.android.glide.disklrucache\\4.16.0.14\\xamarin.android.glide.disklrucache.4.16.0.14.nupkg.sha512",

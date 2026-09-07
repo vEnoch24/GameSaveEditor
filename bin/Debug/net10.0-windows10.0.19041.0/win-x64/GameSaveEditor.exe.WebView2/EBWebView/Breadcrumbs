@@ -1,69 +1,82 @@
-0:00:00 Tab1 StartNav2 #typed
-0:00:00 Tab1 FinishNav2
+0:07:30 Memory Pressure: None
+0:09:10 Widget Closed: TooltipAura
+0:10:50 Widget Closed: 
+0:10:58 ZoomPlus
+0:10:58 ZoomPlus
+0:10:58 ZoomPlus
+0:10:58 ZoomPlus
+0:10:59 ZoomMinus
+0:10:59 ZoomMinus
+0:10:59 ZoomMinus
+0:10:59 ZoomMinus
+0:10:59 ZoomMinus
+0:11:02 ZoomPlus
+0:11:02 ZoomPlus
+0:11:03 ZoomPlus
+0:11:03 ZoomPlus
+0:11:04 ZoomMinus
+0:11:04 ZoomMinus
+0:11:05 ZoomPlus
+0:11:05 ZoomPlus
+0:11:06 ZoomMinus
+0:17:56 Memory Pressure: Moderate
+0:18:06 Memory Pressure: None
+0:26:33 Microsoft.Clipboard.WriteText
+0:30:16 Memory Pressure: Critical
+0:32:22 Microsoft.Autofill.Password.SignIn.NoAutofillSuggestions
+0:35:03 Widget Closed: TooltipAura
+0:35:45 Widget Closed: TooltipAura
+0:35:48 Widget Closed: TooltipAura
+0:36:01 Widget Closed: TooltipAura
+0:36:21 Widget Closed: TooltipAura
+0:36:21 Widget Closed: TooltipAura
+0:37:29 Widget Closed: TooltipAura
+0:37:41 Widget Closed: TooltipAura
+0:39:37 Widget Closed: TooltipAura
+0:39:51 ZoomMinus
+0:40:06 Widget Closed: TooltipAura
+0:40:09 Widget Closed: TooltipAura
+0:40:36 Widget Closed: TooltipAura
+0:40:57 Widget Closed: TooltipAura
+0:41:17 Widget Closed: TooltipAura
+0:41:20 Widget Closed: TooltipAura
+0:41:32 Widget Closed: TooltipAura
+0:41:37 Widget Closed: TooltipAura
+0:43:54 Widget Closed: 
+0:43:55 Widget Closed: 
+0:43:58 Widget Closed: 
+0:44:00 Widget Closed: TooltipAura
+0:44:33 Widget Closed: TooltipAura
+0:44:35 Widget Closed: TooltipAura
+0:45:07 Widget Closed: TooltipAura
+0:45:08 Widget Closed: TooltipAura
+0:45:09 Widget Closed: TooltipAura
+0:45:10 Widget Closed: TooltipAura
+0:45:17 Widget Closed: TooltipAura
+0:45:26 Widget Closed: TooltipAura
+0:45:41 Widget Closed: TooltipAura
+0:45:54 Widget Closed: TooltipAura
+0:52:23 Widget Closed: TooltipAura
+0:52:33 Widget Closed: TooltipAura
+0:53:03 Widget Closed: TooltipAura
+0:53:15 Widget Closed: TooltipAura
+0:53:21 Microsoft.Shutdown.OnWindowClosing
+0:00:00 Startup
+0:00:00 Microsoft.DeleteProfileHelper.CleanUpEphemeralProfiles
+0:00:00 Microsoft.DeleteProfileHelper.CleanUpDeletedProfiles
+0:00:00 Microsoft.NewBrowser_Popup
+0:00:00 Microsoft.BrowserList.AddBrowser
+0:00:00 Browser1 Insert active Tab1 at 0
+0:00:00 Tab1 StartNav1 #auto_toplevel
+0:00:00 Tab1 FinishNav1
+0:00:00 Tab1 PageLoad
+0:00:01 Tab1 StartNav2 #typed
+0:00:01 Tab1 FinishNav2
 0:00:01 Tab1 PageLoad
-0:00:07 Microsoft.Shutdown.OnWindowClosing
-0:00:00 Startup
-0:00:00 Microsoft.DeleteProfileHelper.CleanUpEphemeralProfiles
-0:00:00 Microsoft.DeleteProfileHelper.CleanUpDeletedProfiles
-0:00:00 Microsoft.NewBrowser_Popup
-0:00:00 Microsoft.BrowserList.AddBrowser
-0:00:00 Browser1 Insert active Tab1 at 0
-0:00:00 Tab1 StartNav1 #auto_toplevel
-0:00:00 Tab1 FinishNav1
-0:00:00 Tab1 PageLoad
-0:00:00 Tab1 StartNav2 #typed
-0:00:00 Tab1 FinishNav2
-0:00:01 Tab1 PageLoad
-0:00:22 Microsoft.Autofill.Password.SignIn.NoAutofillSuggestions
-0:01:03 Microsoft.Shutdown.OnWindowClosing
-0:00:00 Startup
-0:00:00 Microsoft.DeleteProfileHelper.CleanUpEphemeralProfiles
-0:00:00 Microsoft.DeleteProfileHelper.CleanUpDeletedProfiles
-0:00:00 Microsoft.NewBrowser_Popup
-0:00:00 Microsoft.BrowserList.AddBrowser
-0:00:00 Browser1 Insert active Tab1 at 0
-0:00:00 Tab1 StartNav1 #auto_toplevel
-0:00:00 Tab1 FinishNav1
-0:00:00 Tab1 PageLoad
-0:00:00 Tab1 StartNav2 #typed
-0:00:00 Tab1 FinishNav2
-0:00:00 Tab1 PageLoad
-0:00:10 Microsoft.Autofill.Password.SignIn.NoAutofillSuggestions
-0:00:37 Microsoft.Shutdown.OnWindowClosing
-0:00:00 Startup
-0:00:00 Microsoft.DeleteProfileHelper.CleanUpEphemeralProfiles
-0:00:00 Microsoft.DeleteProfileHelper.CleanUpDeletedProfiles
-0:00:00 Microsoft.NewBrowser_Popup
-0:00:00 Microsoft.BrowserList.AddBrowser
-0:00:00 Browser1 Insert active Tab1 at 0
-0:00:00 Tab1 StartNav1 #auto_toplevel
-0:00:00 Tab1 FinishNav1
-0:00:00 Tab1 PageLoad
-0:00:00 Tab1 StartNav2 #typed
-0:00:00 Tab1 FinishNav2
-0:00:01 Memory Pressure: Critical
-0:00:01 Tab1 PageLoad
-0:00:16 Microsoft.Autofill.Password.SignIn.NoAutofillSuggestions
-0:00:25 Memory Pressure: Moderate
-0:00:35 Memory Pressure: Moderate
-0:00:40 Memory Pressure: Critical
-0:00:45 Memory Pressure: Moderate
-0:00:50 Memory Pressure: Critical
-0:00:55 Memory Pressure: None
-0:01:00 Memory Pressure: Moderate
-0:01:10 Memory Pressure: None
-0:01:22 Microsoft.Shutdown.OnWindowClosing
-0:00:00 Startup
-0:00:00 Microsoft.DeleteProfileHelper.CleanUpEphemeralProfiles
-0:00:00 Microsoft.DeleteProfileHelper.CleanUpDeletedProfiles
-0:00:00 Microsoft.NewBrowser_Popup
-0:00:00 Microsoft.BrowserList.AddBrowser
-0:00:00 Browser1 Insert active Tab1 at 0
-0:00:00 Tab1 StartNav1 #auto_toplevel
-0:00:00 Tab1 FinishNav1
-0:00:00 Tab1 PageLoad
-0:00:00 Tab1 StartNav2 #typed
-0:00:00 Tab1 FinishNav2
-0:00:00 Tab1 PageLoad
-0:00:15 Microsoft.Autofill.Password.SignIn.NoAutofillSuggestions
-0:00:29 Microsoft.Shutdown.OnWindowClosing
+0:00:52 Microsoft.Autofill.Password.SignIn.NoAutofillSuggestions
+0:01:09 Microsoft.Autofill.Password.SignIn.NoAutofillSuggestions
+0:01:29 Widget Closed: TooltipAura
+0:01:30 Widget Closed: TooltipAura
+0:01:32 Widget Closed: TooltipAura
+0:01:54 Widget Closed: TooltipAura
+0:02:07 Microsoft.Shutdown.OnWindowClosing

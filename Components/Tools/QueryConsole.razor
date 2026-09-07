@@ -1,0 +1,45 @@
+﻿@using System.Globalization
+@using GameSaveEditor.Models
+
+<div class="query-console">
+    <div class="manager-toolbar"><div><div class="eyebrow">QUERY CONSOLE</div><h2>Read-only SQL console</h2><p class="manager-subtitle">SELECT / PRAGMA inspection only. Editing remains protected by the staged save pipeline.</p></div><button class="btn btn-primary" @onclick="RunAsync" disabled="@_running">@(_running ? "Running…" : "Run query")</button></div>
+    <textarea class="query-editor" @bind="_sql" placeholder="SELECT * FROM your_table LIMIT 100;"></textarea>
+    @if (_error is not null)
+    {
+        <div class="error-banner compact-banner"><span>@_error</span></div>
+    }
+    @if (_result is not null)
+    {
+        <div class="query-meta">@_result.Rows.Count.ToString("N0") rows returned @if(_result.Rows.Count>=DatabaseConfiguration.MaxQueryRows){
+            <span>• capped at @DatabaseConfiguration.MaxQueryRows.ToString("N0")</span>
+        }
+    </div><div class="grid-container query-grid"><table class="data-grid"><thead><tr>@foreach(var c in _result.Columns){
+    <th>@c</th>
+}
+</tr></thead><tbody>@foreach(var row in _result.Rows){
+<tr>@foreach(var c in _result.Columns){var v=row.GetValueOrDefault(c);
+    <td>@(v is null ? "NULL" : v is byte[] b ? $"BLOB · {b.Length} bytes" : v.ToString())</td>
+}
+</tr>
+    }
+</tbody></table></div>
+    }
+</div>
+@code {
+    [Parameter, EditorRequired] public DatabaseService Database { get; set; } = null!;
+    private string _sql = "SELECT name, type FROM sqlite_master WHERE type='table' ORDER BY name;"; private QueryResult? _result; private string? _error; private bool _running;
+    private async Task RunAsync()
+    {
+        _error = null;
+        _running = true;
+        try
+        {
+            var trimmed = _sql.TrimStart();
+            if (!trimmed.StartsWith("SELECT", StringComparison.OrdinalIgnoreCase) && !trimmed.StartsWith("PRAGMA", StringComparison.OrdinalIgnoreCase) && !trimmed.StartsWith("EXPLAIN", StringComparison.OrdinalIgnoreCase))
+                throw new InvalidOperationException("The query console is read-only. Use SELECT, PRAGMA, or EXPLAIN statements.");
+            _result = await Database.ExecuteQueryAsync(_sql);
+        }
+        catch (Exception ex) { _error = ex.Message; _result = null; }
+        finally { _running = false; }
+    }
+}

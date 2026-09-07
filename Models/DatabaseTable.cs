@@ -16,5 +16,6 @@ public sealed class DatabaseTable
         get; init;
     }
     public List<DatabaseColumn> Columns { get; } = [];
+    public List<DatabaseForeignKey> ForeignKeys { get; } = [];
     public List<DatabaseRow> Rows { get; } = [];
 }

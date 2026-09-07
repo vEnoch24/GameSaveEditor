@@ -1,0 +1,89 @@
+﻿@using GameSaveEditor.Models
+@inject ProfileService Profiles
+
+<div class="profile-manager">
+    <div class="manager-toolbar"><div><div class="eyebrow">CONFIGURATION</div><h3>Database profiles</h3><p class="manager-subtitle">Save reusable database locations and encryption configurations. Encryption keys are stored separately and can be protected with Windows DPAPI.</p></div><button class="btn btn-primary" @onclick="NewProfile">＋ New profile</button></div>
+    <div class="profile-grid">
+        @foreach (var p in Profiles.All)
+        {
+            <div class="profile-card @(p.IsBuiltIn ? "built-in" : "")">
+                <div class="profile-card-top"><div><strong>@p.Name</strong><span>@p.Encryption</span></div><span class="profile-type">@(p.IsBuiltIn ? "BUILT-IN" : "CUSTOM")</span></div>
+                <p>@p.Description</p>
+                @if (!string.IsNullOrWhiteSpace(p.DatabasePath))
+                {
+                    <div class="profile-path" title="@p.DatabasePath">@p.DatabasePath</div>
+                }
+                <div class="profile-card-actions"><button class="btn btn-secondary" @onclick="() => Edit(p)">@(p.IsBuiltIn ? "Duplicate" : "Edit")</button>@if(p.UsesPassphrase && Profiles.HasStoredKey(p.Id)){
+                    <button class="btn btn-secondary" @onclick="() => ForgetKey(p)">Forget key</button>
+                }
+                @if (!p.IsBuiltIn)
+                {
+                    <button class="btn btn-secondary" @onclick="() => Delete(p)">Delete</button>
+                }
+            </div>
+        </div>
+    }
+</div>
+</div>
+
+@if (_editing is not null)
+{
+    <div class="modal-backdrop">
+        <div class="modal-card wide-modal">
+            <div class="modal-header"><div><div class="eyebrow">PROFILE</div><h2>@(_editing.Id.Length == 0 ? "Create profile" : "Edit profile")</h2></div><button class="icon-button" @onclick="Cancel">×</button></div>
+            <div class="insert-form">
+                <div class="field-group"><label class="field-label">Name</label><input class="text-input" @bind="_editing.Name" /></div>
+                <div class="field-group"><label class="field-label">Encryption</label><select class="text-input" @bind="_editing.Encryption"><option>Plain SQLite</option><option>SQLCipher</option></select></div>
+                <div class="field-group" style="grid-column:1/-1"><label class="field-label">Description</label><input class="text-input" @bind="_editing.Description" /></div>
+                <div class="field-group" style="grid-column:1/-1"><label class="field-label">Default database path <span>optional</span></label><div class="path-picker-row"><input class="text-input" @bind="_editing.DatabasePath" placeholder="C:\\Games\\Save.db" /><button class="btn btn-secondary" @onclick="PickProfileDatabaseAsync">Browse…</button></div></div>
+                <div class="field-group"><label class="field-label">Page size</label><input class="text-input" type="number" @bind="_editing.PageSize" /></div>
+                <div class="field-group"><label class="field-label">KDF iterations</label><input class="text-input" type="number" @bind="_editing.KdfIterations" /></div>
+                <div class="field-group"><label class="field-label">KDF algorithm</label><input class="text-input" @bind="_editing.KdfAlgorithm" /></div>
+                <div class="field-group"><label class="field-label">HMAC algorithm</label><input class="text-input" @bind="_editing.HmacAlgorithm" /></div>
+                <div class="field-group"><label class="checkbox-row"><input type="checkbox" @bind="_editing.UsesPassphrase" /><span>Database uses a key/passphrase</span></label></div>
+            </div>
+            <div class="profile-description">The current application build can open Plain SQLite and SQLCipher 4. Other profile settings are stored so the profile can be carried forward when a compatible native provider is added.</div>
+            <div class="modal-actions"><button class="btn btn-secondary" @onclick="Cancel">Cancel</button><button class="btn btn-primary" @onclick="Save">Save profile</button></div>
+        </div>
+    </div>
+}
+
+@code {
+    private DatabaseProfile? _editing;
+    private void NewProfile() => _editing = new DatabaseProfile { Id = "", Name = "New Game", Encryption = "SQLCipher", UsesPassphrase = true, PageSize = 4096, KdfIterations = 256000, KdfAlgorithm = "PBKDF2-HMAC-SHA512", HmacAlgorithm = "HMAC-SHA512" };
+    private void Edit(DatabaseProfile p)
+    {
+        var clone = p.Clone();
+        if (p.IsBuiltIn)
+        {
+            clone.Id = "";
+            clone.IsBuiltIn = false;
+            clone.Name += " Copy";
+        }
+        _editing = clone;
+    }
+    private void Cancel() => _editing = null;
+    private void Save()
+    {
+        if (_editing is null || string.IsNullOrWhiteSpace(_editing.Name))
+            return;
+        Profiles.SaveProfile(_editing);
+        _editing = null;
+        StateHasChanged();
+    }
+    private async Task PickProfileDatabaseAsync()
+    {
+        if (_editing is null)
+            return;
+        var r = await FilePicker.Default.PickAsync(new PickOptions { PickerTitle = "Choose the game save database", FileTypes = new FilePickerFileType(new Dictionary<DevicePlatform, IEnumerable<string>> { [DevicePlatform.WinUI] = new[] { ".db", ".sqlite", ".sqlite3" } }) });
+        if (r is not null && !string.IsNullOrWhiteSpace(r.FullPath))
+            _editing.DatabasePath = r.FullPath;
+    }
+
+    private void Delete(DatabaseProfile p)
+    {
+        Profiles.RemoveStoredKey(p.Id);
+        Profiles.DeleteProfile(p.Id);
+    }
+    private void ForgetKey(DatabaseProfile p) => Profiles.RemoveStoredKey(p.Id);
+}

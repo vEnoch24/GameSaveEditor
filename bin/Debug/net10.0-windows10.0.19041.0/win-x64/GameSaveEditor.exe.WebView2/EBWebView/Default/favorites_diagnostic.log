@@ -547,3 +547,133 @@
 2026-09-04 18:02:08.295: [INFO] BookmarksLoadDropped droppedNodes=0
 2026-09-04 18:02:08.295: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
 2026-09-04 18:02:37.392: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-09-04 18:55:00.643: [INFO] CurrentProfilePath: C:\Users\Enoch\source\repos\GameSaveEditor\GameSaveEditor\bin\Debug\net10.0-windows10.0.19041.0\win-x64\GameSaveEditor.exe.WebView2\EBWebView\Default
+2026-09-04 18:55:00.643: [INFO] Profiles total count: 1
+2026-09-04 18:55:00.643: [INFO] Profile: name=Profile 1 path=C:\Users\Enoch\source\repos\GameSaveEditor\GameSaveEditor\bin\Debug\net10.0-windows10.0.19041.0\win-x64\GameSaveEditor.exe.WebView2\EBWebView\Default lastActive=2026-09-04T18:02:22.889Z
+2026-09-04 18:55:00.643: [INFO] LastUsedProfileDir: C:\Users\Enoch\source\repos\GameSaveEditor\GameSaveEditor\bin\Debug\net10.0-windows10.0.19041.0\win-x64\GameSaveEditor.exe.WebView2\EBWebView\Default
+2026-09-04 18:55:00.643: [INFO] MostRecentlyActiveProfile: name=Profile 1 path=C:\Users\Enoch\source\repos\GameSaveEditor\GameSaveEditor\bin\Debug\net10.0-windows10.0.19041.0\win-x64\GameSaveEditor.exe.WebView2\EBWebView\Default lastActive=2026-09-04T18:02:22.889Z
+2026-09-04 18:55:00.643: [INFO] OnDoneLoading sync enabled: 0
+2026-09-04 18:55:00.643: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-09-04 18:55:00.643: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-09-04 18:55:00.643: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-09-04 19:29:39.382: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-09-04 19:29:45.581: [INFO] CurrentProfilePath: C:\Users\Enoch\source\repos\GameSaveEditor\GameSaveEditor\bin\Debug\net10.0-windows10.0.19041.0\win-x64\GameSaveEditor.exe.WebView2\EBWebView\Default
+2026-09-04 19:29:45.581: [INFO] Profiles total count: 1
+2026-09-04 19:29:45.581: [INFO] Profile: name=Profile 1 path=C:\Users\Enoch\source\repos\GameSaveEditor\GameSaveEditor\bin\Debug\net10.0-windows10.0.19041.0\win-x64\GameSaveEditor.exe.WebView2\EBWebView\Default lastActive=2026-09-04T19:29:39.082Z
+2026-09-04 19:29:45.581: [INFO] LastUsedProfileDir: C:\Users\Enoch\source\repos\GameSaveEditor\GameSaveEditor\bin\Debug\net10.0-windows10.0.19041.0\win-x64\GameSaveEditor.exe.WebView2\EBWebView\Default
+2026-09-04 19:29:45.581: [INFO] MostRecentlyActiveProfile: name=Profile 1 path=C:\Users\Enoch\source\repos\GameSaveEditor\GameSaveEditor\bin\Debug\net10.0-windows10.0.19041.0\win-x64\GameSaveEditor.exe.WebView2\EBWebView\Default lastActive=2026-09-04T19:29:39.082Z
+2026-09-04 19:29:45.581: [INFO] OnDoneLoading sync enabled: 0
+2026-09-04 19:29:45.581: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-09-04 19:29:45.581: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-09-04 19:29:45.581: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-09-04 19:31:43.231: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-09-04 19:33:18.938: [INFO] CurrentProfilePath: C:\Users\Enoch\source\repos\GameSaveEditor\GameSaveEditor\bin\Debug\net10.0-windows10.0.19041.0\win-x64\GameSaveEditor.exe.WebView2\EBWebView\Default
+2026-09-04 19:33:18.938: [INFO] Profiles total count: 1
+2026-09-04 19:33:18.938: [INFO] Profile: name=Profile 1 path=C:\Users\Enoch\source\repos\GameSaveEditor\GameSaveEditor\bin\Debug\net10.0-windows10.0.19041.0\win-x64\GameSaveEditor.exe.WebView2\EBWebView\Default lastActive=2026-09-04T19:30:47.319Z
+2026-09-04 19:33:18.938: [INFO] LastUsedProfileDir: C:\Users\Enoch\source\repos\GameSaveEditor\GameSaveEditor\bin\Debug\net10.0-windows10.0.19041.0\win-x64\GameSaveEditor.exe.WebView2\EBWebView\Default
+2026-09-04 19:33:18.938: [INFO] MostRecentlyActiveProfile: name=Profile 1 path=C:\Users\Enoch\source\repos\GameSaveEditor\GameSaveEditor\bin\Debug\net10.0-windows10.0.19041.0\win-x64\GameSaveEditor.exe.WebView2\EBWebView\Default lastActive=2026-09-04T19:30:47.319Z
+2026-09-04 19:33:18.938: [INFO] OnDoneLoading sync enabled: 0
+2026-09-04 19:33:18.938: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-09-04 19:33:18.938: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-09-04 19:33:18.938: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-09-04 19:34:29.415: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-09-07 09:07:24.488: [INFO] CurrentProfilePath: C:\Users\Enoch\source\repos\GameSaveEditor\GameSaveEditor\bin\Debug\net10.0-windows10.0.19041.0\win-x64\GameSaveEditor.exe.WebView2\EBWebView\Default
+2026-09-07 09:07:24.488: [INFO] Profiles total count: 1
+2026-09-07 09:07:24.488: [INFO] Profile: name=Profile 1 path=C:\Users\Enoch\source\repos\GameSaveEditor\GameSaveEditor\bin\Debug\net10.0-windows10.0.19041.0\win-x64\GameSaveEditor.exe.WebView2\EBWebView\Default lastActive=2026-09-04T19:34:05.149Z
+2026-09-07 09:07:24.488: [INFO] LastUsedProfileDir: C:\Users\Enoch\source\repos\GameSaveEditor\GameSaveEditor\bin\Debug\net10.0-windows10.0.19041.0\win-x64\GameSaveEditor.exe.WebView2\EBWebView\Default
+2026-09-07 09:07:24.488: [INFO] MostRecentlyActiveProfile: name=Profile 1 path=C:\Users\Enoch\source\repos\GameSaveEditor\GameSaveEditor\bin\Debug\net10.0-windows10.0.19041.0\win-x64\GameSaveEditor.exe.WebView2\EBWebView\Default lastActive=2026-09-04T19:34:05.149Z
+2026-09-07 09:07:24.488: [INFO] OnDoneLoading sync enabled: 0
+2026-09-07 09:07:24.488: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-09-07 09:07:24.488: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-09-07 09:07:24.488: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-09-07 09:07:35.486: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-09-07 10:04:52.764: [INFO] CurrentProfilePath: C:\Users\Enoch\source\repos\GameSaveEditor\GameSaveEditor\bin\Debug\net10.0-windows10.0.19041.0\win-x64\GameSaveEditor.exe.WebView2\EBWebView\Default
+2026-09-07 10:04:52.764: [INFO] Profiles total count: 1
+2026-09-07 10:04:52.764: [INFO] Profile: name=Profile 1 path=C:\Users\Enoch\source\repos\GameSaveEditor\GameSaveEditor\bin\Debug\net10.0-windows10.0.19041.0\win-x64\GameSaveEditor.exe.WebView2\EBWebView\Default lastActive=2026-09-07T09:07:25.001Z
+2026-09-07 10:04:52.764: [INFO] LastUsedProfileDir: C:\Users\Enoch\source\repos\GameSaveEditor\GameSaveEditor\bin\Debug\net10.0-windows10.0.19041.0\win-x64\GameSaveEditor.exe.WebView2\EBWebView\Default
+2026-09-07 10:04:52.764: [INFO] MostRecentlyActiveProfile: name=Profile 1 path=C:\Users\Enoch\source\repos\GameSaveEditor\GameSaveEditor\bin\Debug\net10.0-windows10.0.19041.0\win-x64\GameSaveEditor.exe.WebView2\EBWebView\Default lastActive=2026-09-07T09:07:25.001Z
+2026-09-07 10:04:52.764: [INFO] OnDoneLoading sync enabled: 0
+2026-09-07 10:04:52.764: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-09-07 10:04:52.764: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-09-07 10:04:52.764: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-09-07 10:05:54.519: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-09-07 11:10:34.985: [INFO] CurrentProfilePath: C:\Users\Enoch\source\repos\GameSaveEditor\GameSaveEditor\bin\Debug\net10.0-windows10.0.19041.0\win-x64\GameSaveEditor.exe.WebView2\EBWebView\Default
+2026-09-07 11:10:34.985: [INFO] Profiles total count: 1
+2026-09-07 11:10:34.985: [INFO] Profile: name=Profile 1 path=C:\Users\Enoch\source\repos\GameSaveEditor\GameSaveEditor\bin\Debug\net10.0-windows10.0.19041.0\win-x64\GameSaveEditor.exe.WebView2\EBWebView\Default lastActive=2026-09-07T10:05:12.732Z
+2026-09-07 11:10:34.985: [INFO] LastUsedProfileDir: C:\Users\Enoch\source\repos\GameSaveEditor\GameSaveEditor\bin\Debug\net10.0-windows10.0.19041.0\win-x64\GameSaveEditor.exe.WebView2\EBWebView\Default
+2026-09-07 11:10:34.985: [INFO] MostRecentlyActiveProfile: name=Profile 1 path=C:\Users\Enoch\source\repos\GameSaveEditor\GameSaveEditor\bin\Debug\net10.0-windows10.0.19041.0\win-x64\GameSaveEditor.exe.WebView2\EBWebView\Default lastActive=2026-09-07T10:05:12.732Z
+2026-09-07 11:10:34.985: [INFO] OnDoneLoading sync enabled: 0
+2026-09-07 11:10:34.985: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-09-07 11:10:34.985: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-09-07 11:10:34.985: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-09-07 11:15:16.469: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-09-07 11:26:37.918: [INFO] CurrentProfilePath: C:\Users\Enoch\source\repos\GameSaveEditor\GameSaveEditor\bin\Debug\net10.0-windows10.0.19041.0\win-x64\GameSaveEditor.exe.WebView2\EBWebView\Default
+2026-09-07 11:26:37.918: [INFO] Profiles total count: 1
+2026-09-07 11:26:37.918: [INFO] Profile: name=Profile 1 path=C:\Users\Enoch\source\repos\GameSaveEditor\GameSaveEditor\bin\Debug\net10.0-windows10.0.19041.0\win-x64\GameSaveEditor.exe.WebView2\EBWebView\Default lastActive=2026-09-07T11:14:42.146Z
+2026-09-07 11:26:37.918: [INFO] LastUsedProfileDir: C:\Users\Enoch\source\repos\GameSaveEditor\GameSaveEditor\bin\Debug\net10.0-windows10.0.19041.0\win-x64\GameSaveEditor.exe.WebView2\EBWebView\Default
+2026-09-07 11:26:37.918: [INFO] MostRecentlyActiveProfile: name=Profile 1 path=C:\Users\Enoch\source\repos\GameSaveEditor\GameSaveEditor\bin\Debug\net10.0-windows10.0.19041.0\win-x64\GameSaveEditor.exe.WebView2\EBWebView\Default lastActive=2026-09-07T11:14:42.146Z
+2026-09-07 11:26:37.918: [INFO] OnDoneLoading sync enabled: 0
+2026-09-07 11:26:37.918: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-09-07 11:26:37.918: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-09-07 11:26:37.918: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-09-07 11:28:50.641: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-09-07 11:33:32.882: [INFO] CurrentProfilePath: C:\Users\Enoch\source\repos\GameSaveEditor\GameSaveEditor\bin\Debug\net10.0-windows10.0.19041.0\win-x64\GameSaveEditor.exe.WebView2\EBWebView\Default
+2026-09-07 11:33:32.882: [INFO] Profiles total count: 1
+2026-09-07 11:33:32.882: [INFO] Profile: name=Profile 1 path=C:\Users\Enoch\source\repos\GameSaveEditor\GameSaveEditor\bin\Debug\net10.0-windows10.0.19041.0\win-x64\GameSaveEditor.exe.WebView2\EBWebView\Default lastActive=2026-09-07T11:27:45.876Z
+2026-09-07 11:33:32.882: [INFO] LastUsedProfileDir: C:\Users\Enoch\source\repos\GameSaveEditor\GameSaveEditor\bin\Debug\net10.0-windows10.0.19041.0\win-x64\GameSaveEditor.exe.WebView2\EBWebView\Default
+2026-09-07 11:33:32.882: [INFO] MostRecentlyActiveProfile: name=Profile 1 path=C:\Users\Enoch\source\repos\GameSaveEditor\GameSaveEditor\bin\Debug\net10.0-windows10.0.19041.0\win-x64\GameSaveEditor.exe.WebView2\EBWebView\Default lastActive=2026-09-07T11:27:45.876Z
+2026-09-07 11:33:32.882: [INFO] OnDoneLoading sync enabled: 0
+2026-09-07 11:33:32.882: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-09-07 11:33:32.882: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-09-07 11:33:32.882: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-09-07 11:34:25.264: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-09-07 11:35:19.843: [INFO] CurrentProfilePath: C:\Users\Enoch\source\repos\GameSaveEditor\GameSaveEditor\bin\Debug\net10.0-windows10.0.19041.0\win-x64\GameSaveEditor.exe.WebView2\EBWebView\Default
+2026-09-07 11:35:19.843: [INFO] Profiles total count: 1
+2026-09-07 11:35:19.843: [INFO] Profile: name=Profile 1 path=C:\Users\Enoch\source\repos\GameSaveEditor\GameSaveEditor\bin\Debug\net10.0-windows10.0.19041.0\win-x64\GameSaveEditor.exe.WebView2\EBWebView\Default lastActive=2026-09-07T11:34:18.955Z
+2026-09-07 11:35:19.843: [INFO] LastUsedProfileDir: C:\Users\Enoch\source\repos\GameSaveEditor\GameSaveEditor\bin\Debug\net10.0-windows10.0.19041.0\win-x64\GameSaveEditor.exe.WebView2\EBWebView\Default
+2026-09-07 11:35:19.843: [INFO] MostRecentlyActiveProfile: name=Profile 1 path=C:\Users\Enoch\source\repos\GameSaveEditor\GameSaveEditor\bin\Debug\net10.0-windows10.0.19041.0\win-x64\GameSaveEditor.exe.WebView2\EBWebView\Default lastActive=2026-09-07T11:34:18.955Z
+2026-09-07 11:35:19.843: [INFO] OnDoneLoading sync enabled: 0
+2026-09-07 11:35:19.843: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-09-07 11:35:19.843: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-09-07 11:35:19.843: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-09-07 11:37:53.928: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-09-07 11:40:39.573: [INFO] CurrentProfilePath: C:\Users\Enoch\source\repos\GameSaveEditor\GameSaveEditor\bin\Debug\net10.0-windows10.0.19041.0\win-x64\GameSaveEditor.exe.WebView2\EBWebView\Default
+2026-09-07 11:40:39.573: [INFO] Profiles total count: 1
+2026-09-07 11:40:39.573: [INFO] Profile: name=Profile 1 path=C:\Users\Enoch\source\repos\GameSaveEditor\GameSaveEditor\bin\Debug\net10.0-windows10.0.19041.0\win-x64\GameSaveEditor.exe.WebView2\EBWebView\Default lastActive=2026-09-07T11:37:47.024Z
+2026-09-07 11:40:39.573: [INFO] LastUsedProfileDir: C:\Users\Enoch\source\repos\GameSaveEditor\GameSaveEditor\bin\Debug\net10.0-windows10.0.19041.0\win-x64\GameSaveEditor.exe.WebView2\EBWebView\Default
+2026-09-07 11:40:39.573: [INFO] MostRecentlyActiveProfile: name=Profile 1 path=C:\Users\Enoch\source\repos\GameSaveEditor\GameSaveEditor\bin\Debug\net10.0-windows10.0.19041.0\win-x64\GameSaveEditor.exe.WebView2\EBWebView\Default lastActive=2026-09-07T11:37:47.024Z
+2026-09-07 11:40:39.573: [INFO] OnDoneLoading sync enabled: 0
+2026-09-07 11:40:39.573: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-09-07 11:40:39.573: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-09-07 11:40:39.573: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-09-07 11:42:04.999: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-09-07 11:43:41.608: [INFO] CurrentProfilePath: C:\Users\Enoch\source\repos\GameSaveEditor\GameSaveEditor\bin\Debug\net10.0-windows10.0.19041.0\win-x64\GameSaveEditor.exe.WebView2\EBWebView\Default
+2026-09-07 11:43:41.608: [INFO] Profiles total count: 1
+2026-09-07 11:43:41.608: [INFO] Profile: name=Profile 1 path=C:\Users\Enoch\source\repos\GameSaveEditor\GameSaveEditor\bin\Debug\net10.0-windows10.0.19041.0\win-x64\GameSaveEditor.exe.WebView2\EBWebView\Default lastActive=2026-09-07T11:41:49.966Z
+2026-09-07 11:43:41.608: [INFO] LastUsedProfileDir: C:\Users\Enoch\source\repos\GameSaveEditor\GameSaveEditor\bin\Debug\net10.0-windows10.0.19041.0\win-x64\GameSaveEditor.exe.WebView2\EBWebView\Default
+2026-09-07 11:43:41.608: [INFO] MostRecentlyActiveProfile: name=Profile 1 path=C:\Users\Enoch\source\repos\GameSaveEditor\GameSaveEditor\bin\Debug\net10.0-windows10.0.19041.0\win-x64\GameSaveEditor.exe.WebView2\EBWebView\Default lastActive=2026-09-07T11:41:49.966Z
+2026-09-07 11:43:41.608: [INFO] OnDoneLoading sync enabled: 0
+2026-09-07 11:43:41.608: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-09-07 11:43:41.608: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-09-07 11:43:41.608: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-09-07 11:56:23.647: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-09-07 11:56:55.884: [INFO] CurrentProfilePath: C:\Users\Enoch\source\repos\GameSaveEditor\GameSaveEditor\bin\Debug\net10.0-windows10.0.19041.0\win-x64\GameSaveEditor.exe.WebView2\EBWebView\Default
+2026-09-07 11:56:55.884: [INFO] Profiles total count: 1
+2026-09-07 11:56:55.884: [INFO] Profile: name=Profile 1 path=C:\Users\Enoch\source\repos\GameSaveEditor\GameSaveEditor\bin\Debug\net10.0-windows10.0.19041.0\win-x64\GameSaveEditor.exe.WebView2\EBWebView\Default lastActive=2026-09-07T11:56:03.491Z
+2026-09-07 11:56:55.884: [INFO] LastUsedProfileDir: C:\Users\Enoch\source\repos\GameSaveEditor\GameSaveEditor\bin\Debug\net10.0-windows10.0.19041.0\win-x64\GameSaveEditor.exe.WebView2\EBWebView\Default
+2026-09-07 11:56:55.884: [INFO] MostRecentlyActiveProfile: name=Profile 1 path=C:\Users\Enoch\source\repos\GameSaveEditor\GameSaveEditor\bin\Debug\net10.0-windows10.0.19041.0\win-x64\GameSaveEditor.exe.WebView2\EBWebView\Default lastActive=2026-09-07T11:56:03.491Z
+2026-09-07 11:56:55.884: [INFO] OnDoneLoading sync enabled: 0
+2026-09-07 11:56:55.884: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-09-07 11:56:55.884: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-09-07 11:56:55.884: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-09-07 12:50:17.160: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-09-07 12:50:37.272: [INFO] CurrentProfilePath: C:\Users\Enoch\source\repos\GameSaveEditor\GameSaveEditor\bin\Debug\net10.0-windows10.0.19041.0\win-x64\GameSaveEditor.exe.WebView2\EBWebView\Default
+2026-09-07 12:50:37.272: [INFO] Profiles total count: 1
+2026-09-07 12:50:37.272: [INFO] Profile: name=Profile 1 path=C:\Users\Enoch\source\repos\GameSaveEditor\GameSaveEditor\bin\Debug\net10.0-windows10.0.19041.0\win-x64\GameSaveEditor.exe.WebView2\EBWebView\Default lastActive=2026-09-07T12:49:05.936Z
+2026-09-07 12:50:37.272: [INFO] LastUsedProfileDir: C:\Users\Enoch\source\repos\GameSaveEditor\GameSaveEditor\bin\Debug\net10.0-windows10.0.19041.0\win-x64\GameSaveEditor.exe.WebView2\EBWebView\Default
+2026-09-07 12:50:37.272: [INFO] MostRecentlyActiveProfile: name=Profile 1 path=C:\Users\Enoch\source\repos\GameSaveEditor\GameSaveEditor\bin\Debug\net10.0-windows10.0.19041.0\win-x64\GameSaveEditor.exe.WebView2\EBWebView\Default lastActive=2026-09-07T12:49:05.936Z
+2026-09-07 12:50:37.272: [INFO] OnDoneLoading sync enabled: 0
+2026-09-07 12:50:37.272: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-09-07 12:50:37.272: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-09-07 12:50:37.272: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-09-07 12:52:44.698: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1

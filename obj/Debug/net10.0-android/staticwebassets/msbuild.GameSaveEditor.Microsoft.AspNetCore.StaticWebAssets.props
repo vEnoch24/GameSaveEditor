@@ -12,12 +12,12 @@
       <RelatedAsset></RelatedAsset>
       <AssetTraitName></AssetTraitName>
       <AssetTraitValue></AssetTraitValue>
-      <Fingerprint>q2jdl44x0t</Fingerprint>
-      <Integrity>0uZ0RiwfjudiLD+n209ZwZr6sMrbZvhmjZXOet8sgaA=</Integrity>
+      <Fingerprint>1u4sqqdrtb</Fingerprint>
+      <Integrity>eZlwhgb6yGVYIF1ki09Gjz+IJMykTFlDSiwMkXIQLUw=</Integrity>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-      <FileLength>18105</FileLength>
-      <LastWriteTime>Fri, 04 Sep 2026 17:19:11 GMT</LastWriteTime>
+      <FileLength>18181</FileLength>
+      <LastWriteTime>Fri, 04 Sep 2026 17:53:19 GMT</LastWriteTime>
       <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\app.css'))</OriginalItemSpec>
     </StaticWebAsset>
     <StaticWebAsset Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\GameSaveEditor.styles.css'))">
