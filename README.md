@@ -1,6 +1,6 @@
 # GameSaveEditor
 
-A powerful Windows application designed for editing game save file data. Built with modern .NET technologies, GameSaveEditor provides a user-friendly interface for managing, analyzing, and modifying game save files with ease and precision.
+A Windows application designed for editing game save file data. Built with modern .NET technologies, GameSaveEditor provides a user-friendly interface for managing, analyzing, and modifying game save files with ease and precision(right now supports only .db, .sqlite, .sqlite3).
 
 ![GameSaveEditor Screenshot](image.png)
 
