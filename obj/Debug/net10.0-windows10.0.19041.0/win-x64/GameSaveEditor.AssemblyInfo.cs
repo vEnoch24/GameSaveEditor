@@ -18,7 +18,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("GameSaveEditor")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0+ded3145b4592e3dbf40a6d0963c30f7db6520b1d")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0+320ffb9fe1bb34b7f081cac6814942e2292d170c")]
 [assembly: System.Reflection.AssemblyProductAttribute("GameSaveEditor")]
 [assembly: System.Reflection.AssemblyTitleAttribute("GameSaveEditor")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

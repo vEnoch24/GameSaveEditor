@@ -1,0 +1,8 @@
+<api type="release" assembly-name="GameSaveEditor" mvid="9af91938206b41d686df33fe0f0dc824">
+  <module assembly-name="GameSaveEditor" mvid="9af91938206b41d686df33fe0f0dc824" mvid-bytes="OBn5mmsg1kGG3zP+Dw3IJA==">
+    <types-scratch>
+      <entry key="crc64635cc816b4fb2862/MainActivity" java-name="crc64635cc816b4fb2862/MainActivity" managed-type-name="GameSaveEditor.MainActivity" token="33554450" />
+      <entry key="crc64635cc816b4fb2862/MainApplication" java-name="crc64635cc816b4fb2862/MainApplication" managed-type-name="GameSaveEditor.MainApplication" token="33554451" />
+    </types-scratch>
+  </module>
+</api>
