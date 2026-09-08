@@ -1,466 +1,1289 @@
-# GameSaveEditor
+# 🎮 Game Save Editor
 
-A Windows application designed for editing game save file data. Built with modern .NET technologies, GameSaveEditor provides a user-friendly interface for managing, analyzing, and modifying game save files with ease and precision(right now supports only .db, .sqlite, .sqlite3).
+<p align="center">
+  <img src="https://img.shields.io/badge/.NET-10.0-512BD4?style=for-the-badge&logo=dotnet&logoColor=white" alt=".NET 10">
+  <img src="https://img.shields.io/badge/.NET%20MAUI-Windows-512BD4?style=for-the-badge&logo=dotnet&logoColor=white" alt=".NET MAUI">
+  <img src="https://img.shields.io/badge/SQLite-SQLCipher-003B57?style=for-the-badge&logo=sqlite&logoColor=white" alt="SQLite / SQLCipher">
+  <img src="https://img.shields.io/badge/Platform-Windows-0078D4?style=for-the-badge&logo=windows&logoColor=white" alt="Windows">
+</p>
 
-![GameSaveEditor Screenshot](image.png)
+<p align="center">
+  <strong>A modern, extensible desktop database editor for game save files.</strong>
+</p>
 
----
+<p align="center">
+  Inspect, search, edit, compare, and safely modify SQLite and SQLCipher-backed game saves through a modern Windows interface.
+</p>
 
-## Table of Contents
-
-- [Features](#features)
-- [Technology Stack](#technology-stack)
-- [System Requirements](#system-requirements)
-- [Installation](#installation)
-- [Getting Started](#getting-started)
-- [Project Structure](#project-structure)
-- [Architecture Overview](#architecture-overview)
-- [Services](#services)
-- [Development](#development)
-- [Building from Source](#building-from-source)
-- [Contributing](#contributing)
-- [License](#license)
-- [Support](#support)
-
----
-
-## Features
-
-- **Windows-Optimized**: Native Windows 10/11 experience with full integration
-- **Game Save Editing**: Seamlessly edit and modify game save file data
-- **Database Integration**: SQLite database support with encryption capabilities via SQLCipher
-- **Secure Storage**: Protected data handling using Windows App SDK and System.Security.Cryptography
-- **User Profiles**: Manage multiple profiles and their associated settings
-- **Data Backup**: Comprehensive backup and recovery functionality
-- **Memory Management**: Advanced memory management utilities for efficient data handling
-- **Web Interface**: Blazor Web View for modern, responsive UI
-- **Settings Management**: Persistent application settings and preferences
+<p align="center">
+  <a href="#-features">Features</a> •
+  <a href="#-screenshots">Screenshots</a> •
+  <a href="#-getting-started">Getting Started</a> •
+  <a href="#-editing-data">Editing</a> •
+  <a href="#-encryption">Encryption</a> •
+  <a href="#-building">Building</a> •
+  <a href="#-architecture">Architecture</a> •
+  <a href="#-roadmap">Roadmap</a>
+</p>
 
 ---
 
-## Technology Stack
+## 📖 Overview
 
-### Core Framework
-- **[.NET MAUI](https://github.com/dotnet/maui)** (Multi-platform App UI) - Application framework optimized for Windows
-- **[.NET 10.0](https://dotnet.microsoft.com/)** - Latest .NET runtime
-- **[Blazor](https://dotnet.microsoft.com/apps/aspnet/web-apps/blazor)** - Web UI framework with Razor components
+**Game Save Editor** is a Windows desktop application designed to make inspecting and modifying game save databases easier and safer.
 
-### Data & Security
-- **[SQLite](https://www.sqlite.org/)** - Lightweight database engine
-- **[SQLCipher](https://www.zetetic.net/sqlcipher/)** - Encrypted SQLite extension
-- **[System.Security.Cryptography](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography)** - Cryptographic operations
-- **[Microsoft.Data.Sqlite.Core](https://github.com/dotnet/efcore)** - .NET SQLite provider
+Many games store save data in SQLite databases, while others use encrypted SQLite databases through technologies such as **SQLCipher**.
 
-### Windows Integration
-- **[Windows App SDK](https://docs.microsoft.com/en-us/windows/apps/windows-app-sdk/)** - Modern Windows application features
-- **[Windows 10/11 APIs](https://docs.microsoft.com/en-us/windows/)** - Full Windows platform integration
+Instead of requiring users to work directly with SQLite command-line tools or manually manipulate database files, Game Save Editor provides a graphical workflow for:
 
-### Language Composition
-- **Java** (61.2%) - Platform-specific and backend logic
-- **C#** (12.9%) - Primary .NET application code
-- **HTML** (12.8%) - Blazor components and web interface
-- **CSS** (10.0%) - Styling and UI presentation
-- **Roff** (2.9%) - Documentation
-- **AIDL** (0.2%) - Miscellaneous platform-specific code
+* 🔍 Discovering database tables
+* 📊 Browsing database records
+* ✏️ Editing values
+* 🧩 Editing multiple cells simultaneously
+* 🔎 Searching records
+* ↕️ Sorting data
+* 📄 Paginating large datasets
+* 🗑️ Adding and deleting rows
+* ↩️ Undoing and redoing staged changes
+* 🔐 Opening SQLCipher databases
+* 💾 Creating automatic backups
+* 📝 Reviewing changes before saving
+* 🔄 Applying changes transactionally
+* 🧪 Running read-only SQL queries
+* 🔗 Inspecting foreign-key relationships
+* 👤 Securely remembering encryption keys per Windows user
 
----
+The application is designed with **save-data safety** as a priority.
 
-## System Requirements
-
-### Minimum Requirements
-
-- **Windows 10** (version 17763.0 or later) or **Windows 11**
-- **Processor**: Intel Core i3 or equivalent
-- **RAM**: 2 GB minimum
-- **Disk Space**: 100 MB for installation
-- **.NET 10.0 Runtime** (automatically installed with the application)
-
-### Recommended Requirements
-
-- **Windows 11** (latest version)
-- **Processor**: Intel Core i5 or newer / AMD Ryzen 5 or newer
-- **RAM**: 4 GB or more
-- **Storage**: SSD (for better performance)
-- **Display**: 1080p or higher resolution
-- **.NET 10.0 SDK** (for development only)
+> **Changes are staged first. Nothing is permanently written until you explicitly choose `Save Changes`.**
 
 ---
 
-## Installation
+## ✨ Features
 
-### From Release
+### 🗄️ Database Support
 
-1. Download the latest release from the [Releases](https://github.com/vEnoch24/GameSaveEditor/releases) page
-2. Extract the archive to your desired location (e.g., `C:\Program Files\GameSaveEditor`)
-3. Run `GameSaveEditor.exe` to launch the application
-4. (Optional) Create a shortcut on your desktop for easy access
-
-### Prerequisites
-
-- Windows 10 (17763.0+) or Windows 11
-- .NET 10.0 Runtime (included in the release or downloadable from [Microsoft](https://dotnet.microsoft.com/download))
-
-### From Source
-
-See [Building from Source](#building-from-source) section below.
-
----
-
-## Getting Started
-
-### First Launch
-
-1. Launch `GameSaveEditor.exe`
-2. The application will initialize required services and databases
-3. Create your first profile or import existing game save files
-4. Begin editing your game save data
-
-### Basic Workflow
-
-1. **Open Save File**: Load a game save file using the file browser
-2. **Analyze Data**: View and explore save file structure and contents
-3. **Edit Values**: Modify specific game data (stats, inventory, achievements, etc.)
-4. **Backup**: Create a backup before making changes
-5. **Save Changes**: Apply modifications and export the updated save file
-
-### Configuration
-
-- Application settings are accessible through the Settings menu
-- Profiles can be managed and switched through the UI
-- Database encryption is handled automatically via SQLCipher
-- All data is stored securely with Windows security integration
+| Feature                        | Supported |
+| ------------------------------ | :-------: |
+| SQLite databases               |     ✅     |
+| SQLCipher 4                    |     ✅     |
+| SQLCipher 3 configuration      |     ⚙️    |
+| Custom SQLCipher configuration |     ⚙️    |
+| Automatic database probing     |     ✅     |
+| Encrypted database detection   |     ✅     |
+| Schema discovery               |     ✅     |
+| Table discovery                |     ✅     |
+| Column metadata                |     ✅     |
+| Primary-key detection          |     ✅     |
+| Foreign-key detection          |     ✅     |
+| WITHOUT ROWID detection        |     ✅     |
 
 ---
 
-## Project Structure
+### 📊 Modern Table Editor
 
-```
-GameSaveEditor/
-├── Components/               # Blazor components and UI components
-├── Models/                   # Data models and entity definitions
-├── Services/                 # Business logic and service layer
-│   ├── DatabaseService.cs    # Database operations
-│   ├── MemoryService.cs      # Memory management
-│   ├── BackupService.cs      # Backup and recovery
-│   ├── AppSettingsService.cs # Settings management
-│   ├── KeyVaultService.cs    # Secure credential storage
-│   ├── ProfileService.cs     # Profile management
-│   └── DatabaseProbeService.cs # Database analysis
-├── Platforms/               # Windows-specific platform code
-├── Properties/              # Assembly properties and metadata
-├── Resources/               # App icons, splash screens, fonts, images
-├── wwwroot/                 # Static web assets for Blazor
-├── App.xaml                 # Application root XAML
-├── App.xaml.cs              # Application code-behind
-├── MainPage.xaml            # Main application page
-├── MainPage.xaml.cs         # Main page code-behind
-├── MauiProgram.cs           # MAUI application configuration
-├── DeploymentManagerAutoInitializer.cs # Auto-initialization logic
-├── WindowsAppSDK-VersionInfo.cs # Windows SDK version information
-└── GameSaveEditor.csproj    # Project configuration
+Browse database tables through a structured, spreadsheet-style interface.
+
+The editor supports:
+
+* Column headers
+* Row numbers
+* Primary-key indicators
+* Foreign-key indicators
+* Data-type information
+* Search
+* Sorting
+* Pagination
+* Cell selection
+* Multi-cell selection
+* Bulk editing
+* Row insertion
+* Row deletion
+* Staged modifications
+
+---
+
+## 🖱️ Multi-Cell Selection & Bulk Editing
+
+Phase 7 introduces spreadsheet-style selection.
+
+You can select multiple cells and modify them simultaneously.
+
+### Selection methods
+
+#### Click + Drag
+
+Click a cell and drag across the table to create a rectangular selection.
+
+```text
+┌─────────┬─────────┬─────────┬─────────┐
+│ ID      │ Name    │ Level   │ Gold    │
+├─────────┼─────────┼─────────┼─────────┤
+│ 001     │ Knight  │ 10      │ 500     │
+│ 002     │ Mage    │ 12      │ 750     │
+│ 003     │ Rogue   │ 8       │ 300     │
+│ 004     │ Archer  │ 15      │ 900     │
+└─────────┴─────────┴─────────┴─────────┘
+              ▲──────────────▲
+                 selection
 ```
 
+#### Shift + Click
+
+Select a rectangular range between two cells.
+
+#### Ctrl + Click
+
+Add or remove individual cells from the current selection.
+
 ---
 
-## Architecture Overview
+### Bulk Editing
 
-### Layered Architecture
+After selecting compatible cells, use:
 
-The application follows a clean, layered architecture optimized for Windows:
+> **Edit Selected**
 
-```
-┌─────────────────────────────────────┐
-│   UI Layer (Blazor Web View)        │
-│   - HTML Components                 │
-│   - CSS Styling                     │
-│   - Windows Integration             │
-└──────────────┬──────────────────────┘
-               │
-┌──────────────▼──────────────────────┐
-│   Component Layer                    │
-│   - Razor Components                │
-│   - Navigation & Dialogs            │
-│   - Forms & Input Controls          │
-└──────────────┬──────────────────────┘
-               │
-┌──────────────▼──────────────────────┐
-│   Service Layer                      │
-│   - Business Logic                  │
-│   - Data Processing                 │
-│   - Windows-Specific Services       │
-└──────────────┬──────────────────────┘
-               │
-┌──────────────▼──────────────────────┐
-│   Data Layer                         │
-│   - Database Access (SQLite)        │
-│   - Encryption (SQLCipher)          │
-│   - Windows File I/O                │
-└─────────────────────────────────────┘
+A type-aware editor allows one value to be applied to every selected cell.
+
+For example:
+
+```text
+Selected cells: 37
+
+Column:
+    Gold
+
+Type:
+    INTEGER
+
+New value:
+    999999
+
+[ Cancel ]       [ Apply to 37 Cells ]
 ```
 
----
+The operation is staged and can be undone as a single operation.
 
-## Services
+### Supported bulk-edit types
 
-### MemoryService
-Manages in-memory data operations and caching:
-- Efficient data structure management
-- Memory optimization
-- Fast data access patterns
-- Cache management
+* `INTEGER`
+* `REAL`
+* `NUMERIC`
+* `DECIMAL`
+* `TEXT`
+* `BOOLEAN`
+* `DATE/TIME`
+* `JSON`
+* `BLOB`
+* `NULL`
 
-### DatabaseService
-Handles all database operations:
-- SQLite connection management
-- Database initialization
-- CRUD operations on save files
-- Schema management
-- Query optimization
-
-### BackupService
-Provides backup and recovery functionality:
-- Automatic backup creation
-- Backup versioning
-- Recovery operations
-- Backup management and cleanup
-- Scheduled backups
-
-### AppSettingsService
-Manages application preferences and configuration:
-- User preferences persistence
-- Theme and display settings
-- Application state management
-- Configuration persistence
-- Default settings initialization
-
-### KeyVaultService
-Handles secure credential storage:
-- Encryption key management
-- Secure credential storage
-- Windows security integration
-- Data protection API (DPAPI) usage
-- Secure credential retrieval
-
-### ProfileService
-Manages user profiles:
-- Profile creation and deletion
-- Profile-specific settings
-- Profile switching
-- Profile data association
-- Profile backup management
-
-### DatabaseProbeService
-Analyzes and explores database structure:
-- Schema introspection
-- Data type analysis
-- Relationship mapping
-- Statistical analysis
-- Data validation
+Selections containing incompatible types are prevented from being bulk-edited to avoid accidental data conversion.
 
 ---
 
-## Development
+## ✏️ Data Editing
 
-### Prerequisites for Development
+The editor provides type-aware editing rather than treating every database value as plain text.
 
-- [Visual Studio 2022](https://visualstudio.microsoft.com/vs/) (Community, Professional, or Enterprise)
-- [.NET 10.0 SDK](https://dotnet.microsoft.com/download)
-- Git
-- Windows App SDK (installed with Visual Studio)
+### INTEGER
 
-### Setting Up Development Environment
+```text
+42
+100
+999999
+```
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/vEnoch24/GameSaveEditor.git
-   cd GameSaveEditor
-   ```
+### REAL / NUMERIC
 
-2. **Restore dependencies**
-   ```bash
-   dotnet restore
-   ```
+```text
+1.5
+99.95
+0.001
+```
 
-3. **Open in Visual Studio**
-   - Open `GameSaveEditor.csproj` with Visual Studio 2022
-   - Visual Studio will automatically restore all NuGet packages
+### BOOLEAN
 
-4. **Build the project**
-   ```bash
-   dotnet build
-   ```
+Boolean values are presented through a dedicated control rather than requiring users to remember SQLite's integer representation.
 
-### Code Organization Guidelines
+### TEXT
 
-- **Services**: Place business logic in the `Services/` directory
-- **Components**: Create Blazor components in `Components/`
-- **Models**: Define data structures in `Models/`
-- **Windows-Specific**: Use `Platforms/` for Windows-specific implementation
+Regular string editing is supported.
 
-### Debugging
+### JSON
 
-#### Visual Studio Debugging
-1. Set breakpoints in the code by clicking on the line number
-2. Press `F5` to start debugging
-3. Use **Debug** menu for breakpoint management
-4. Monitor variables in the **Watch** window
-5. Use **Immediate Window** for runtime evaluation
-6. Step through code with **F10** (step over) or **F11** (step into)
+JSON values can be:
 
-#### Common Debugging Scenarios
-- **Database Issues**: Check DatabaseService logs
-- **Settings Problems**: Verify AppSettingsService state
-- **Backup Failures**: Review BackupService error logs
-- **Memory Issues**: Use the memory profiler in Visual Studio
+* Edited
+* Formatted
+* Validated
+* Pretty-printed
+
+### BLOB
+
+Binary data can be represented using Base64.
+
+```text
+SGVsbG8gV29ybGQ=
+```
+
+### NULL
+
+Database `NULL` values are explicitly supported.
 
 ---
 
-## Building from Source
+# ↩️ Undo & Redo
 
-### Prerequisites
+Editing is staged before being committed.
 
-- Windows 10 (17763.0+) or Windows 11
-- .NET 10.0 SDK installed
-- Visual Studio 2022 or Visual Studio Code with C# extension
+This allows the user to experiment without immediately modifying the original database.
 
-### Build Commands
+Supported operations include:
 
-**Restore dependencies**
-```bash
+* Cell edits
+* Bulk edits
+* Row insertion
+* Row deletion
+
+For example:
+
+```text
+Edit Cell
+    ↓
+Bulk Edit
+    ↓
+Delete Row
+    ↓
+Undo
+    ↓
+Undo
+    ↓
+Redo
+```
+
+Bulk operations are treated as a single logical operation, making large edits significantly easier to reverse.
+
+---
+
+# 💾 Safe Save System
+
+Game save files are valuable and can be difficult to recover if corrupted.
+
+Game Save Editor therefore uses a staged save workflow.
+
+```text
+Open Database
+      │
+      ▼
+Edit Data
+      │
+      ▼
+Changes Staged
+      │
+      ├───────────────┐
+      │               │
+      ▼               ▼
+Discard           Save Changes
+                      │
+                      ▼
+                  Backup
+                      │
+                      ▼
+                  Transaction
+                      │
+                 ┌────┴────┐
+                 ▼         ▼
+               Success   Failure
+                 │         │
+                 ▼         ▼
+              Commit    Rollback
+```
+
+### Save process
+
+When `Save Changes` is pressed:
+
+1. A backup is created.
+2. A database transaction begins.
+3. All staged changes are applied.
+4. The transaction is committed if successful.
+5. The transaction is rolled back if an error occurs.
+
+This significantly reduces the risk of leaving the database in a partially modified state.
+
+---
+
+# 🗂️ Automatic Backups
+
+Backups are created before an explicit save operation.
+
+Example:
+
+```text
+SaveDatabaseExplorer/
+└── Backups/
+    ├── Save_2026-09-08_120001.db
+    ├── Save_2026-09-08_121542.db
+    └── Save_2026-09-08_123010.db
+```
+
+The application includes a **Backup Manager** for managing previous backups.
+
+### Backup features
+
+* Automatic pre-save backups
+* Timestamped backup names
+* Configurable backup directory
+* Backup retention
+* Backup restoration
+* WAL/SHM cleanup during restoration
+
+---
+
+# 🔐 Encryption & SQLCipher
+
+Game Save Editor supports encrypted SQLite databases through **SQLCipher**.
+
+The current implementation uses:
+
+```text
+Microsoft.Data.Sqlite.Core
+        +
+SQLitePCLRaw.bundle_e_sqlcipher
+```
+
+The primary supported configuration is **SQLCipher 4**.
+
+Typical SQLCipher 4 parameters include:
+
+```text
+Cipher:
+    AES-256-CBC
+
+KDF:
+    PBKDF2-HMAC-SHA512
+
+KDF Iterations:
+    256000
+
+HMAC:
+    HMAC-SHA512
+
+Page Size:
+    4096
+```
+
+The application does not assume that every `.db` file is encrypted.
+
+Instead, it first probes the database and determines whether it appears to be:
+
+* Standard SQLite
+* Encrypted / non-standard SQLite
+* A database requiring a configured encryption profile
+
+---
+
+# 🔑 Secure Key Storage
+
+Encryption keys can optionally be remembered for future sessions.
+
+Keys are **not stored directly inside `profiles.json`**.
+
+Windows DPAPI is used to protect remembered keys:
+
+```text
+Windows User Account
+        │
+        ▼
+       DPAPI
+        │
+        ▼
+Encrypted key storage
+        │
+        ▼
+%LOCALAPPDATA%\SaveDatabaseExplorer\keys.dat
+```
+
+Keys are protected using:
+
+```text
+DataProtectionScope.CurrentUser
+```
+
+This means the stored key is tied to the current Windows user account.
+
+The application provides controls to:
+
+* Remember a database key
+* Forget an individual key
+* Forget all remembered keys
+
+> ⚠️ The application intentionally does not expose or store remembered keys as plaintext configuration values.
+
+---
+
+# 👤 Database Profiles
+
+Profiles allow different games and database configurations to be saved.
+
+A profile can contain:
+
+* Game name
+* Database path
+* Encryption family
+* Page size
+* KDF iterations
+* KDF algorithm
+* HMAC algorithm
+* Whether a passphrase is required
+
+Example:
+
+```text
+┌─────────────────────────────────────────┐
+│ Database Profile                        │
+├─────────────────────────────────────────┤
+│ Game:        Example Game               │
+│ Type:        SQLCipher 4                │
+│ Page Size:   4096                       │
+│ KDF:         PBKDF2-HMAC-SHA512         │
+│ Iterations:  256000                     │
+│ HMAC:        HMAC-SHA512                │
+│                                         │
+│              [ Open Database ]          │
+└─────────────────────────────────────────┘
+```
+
+Built-in profiles include:
+
+* Plain SQLite
+* Solo Leveling
+* SQLCipher 4
+* SQLCipher 3
+* SQLCipher Custom
+
+Built-in profiles are protected from accidental modification and can be duplicated to create custom profiles.
+
+---
+
+# 🧙 Database Setup Wizard
+
+Opening a database uses a three-step workflow.
+
+```text
+1. Database
+      ↓
+2. Profile
+      ↓
+3. Verify
+      ↓
+   Database
+```
+
+### Step 1 — Database
+
+Select the `.db` file.
+
+### Step 2 — Profile
+
+Choose an existing profile or configure a new one.
+
+### Step 3 — Verify
+
+The application tests the selected configuration before opening the database.
+
+This makes incorrect encryption settings easier to diagnose before entering the editor.
+
+---
+
+# 🔎 Search
+
+The table editor supports searching through loaded records.
+
+Search can be used to quickly locate:
+
+* Player names
+* IDs
+* Item IDs
+* Currency values
+* Quest values
+* Character statistics
+* JSON content
+* Other database fields
+
+---
+
+# ↕️ Sorting
+
+Loaded data can be sorted from the table interface.
+
+Sorting is performed on the currently loaded dataset.
+
+> **Note:** Numeric sorting is currently based on the editor's loaded representation and may therefore behave differently from SQLite's native numeric ordering in some mixed-type datasets.
+
+---
+
+# 📄 Pagination
+
+Large tables can contain thousands of records.
+
+To keep the interface responsive, the editor limits the initial loaded dataset to:
+
+```text
+5,000 rows
+```
+
+The table can then be paginated using:
+
+```text
+25
+50
+100
+250
+```
+
+rows per page.
+
+Pagination is currently **UI-side pagination over the loaded dataset**, rather than database-side paging.
+
+---
+
+# 🔗 Foreign Keys
+
+The editor detects foreign-key relationships using:
+
+```sql
+PRAGMA foreign_key_list(table);
+```
+
+Foreign-key metadata can be displayed alongside table information, helping users understand relationships between tables.
+
+Example:
+
+```text
+Player
+ ├── player_id
+ ├── name
+ └── inventory_id
+          │
+          ▼
+      Inventory
+```
+
+---
+
+# 🧪 SQL Query Console
+
+The application includes a read-only SQL console for inspecting databases.
+
+Supported query categories include:
+
+* `SELECT`
+* `PRAGMA`
+* `EXPLAIN`
+
+Example:
+
+```sql
+SELECT *
+FROM Player
+LIMIT 20;
+```
+
+Or:
+
+```sql
+PRAGMA table_info(Player);
+```
+
+The query console is intentionally **read-only**.
+
+It does not provide arbitrary `INSERT`, `UPDATE`, `DELETE`, `DROP`, or other destructive SQL execution.
+
+This keeps database modifications within the controlled editor workflow.
+
+---
+
+# 🛡️ Database Safety
+
+Several safeguards are built into the editor.
+
+### Primary keys
+
+Primary-key information is detected and displayed.
+
+### WITHOUT ROWID
+
+Tables using:
+
+```sql
+WITHOUT ROWID
+```
+
+receive additional protection because they cannot be edited using the same assumptions as ordinary SQLite rowid tables.
+
+### Transactions
+
+Database modifications are applied transactionally.
+
+### Backups
+
+A backup is created before explicit saves.
+
+### Staged changes
+
+Editing does not immediately modify the database on disk.
+
+### Read-only SQL
+
+The SQL console cannot directly execute destructive statements.
+
+---
+
+# 🖥️ Screenshots
+
+> 📸 Add screenshots of the application here.
+
+Recommended screenshots:
+
+### Database Setup
+
+```text
+docs/screenshots/database-setup.png
+```
+
+### Table Editor
+
+```text
+docs/screenshots/table-editor.png
+```
+
+### Multi-Cell Editing
+
+```text
+docs/screenshots/bulk-edit.png
+```
+
+### Database Profiles
+
+```text
+docs/screenshots/profiles.png
+```
+
+### Backup Manager
+
+```text
+docs/screenshots/backups.png
+```
+
+### SQL Console
+
+```text
+docs/screenshots/sql-console.png
+```
+
+Once the screenshots are added to the repository, use:
+
+```markdown
+<p align="center">
+  <img src="docs/screenshots/table-editor.png" width="900">
+</p>
+```
+
+---
+
+# 🚀 Getting Started
+
+## Requirements
+
+### Operating System
+
+* Windows 10 version 1809 or later
+* Windows 11 recommended
+* x64 system
+
+### Development
+
+* Visual Studio 2026
+* .NET 10 SDK
+* .NET MAUI workload
+* Windows SDK
+* Windows App SDK
+
+Verify your SDK:
+
+```powershell
+dotnet --info
+```
+
+Verify installed SDKs:
+
+```powershell
+dotnet --list-sdks
+```
+
+Verify MAUI:
+
+```powershell
+dotnet workload list
+```
+
+If necessary:
+
+```powershell
+dotnet workload install maui
+```
+
+---
+
+# 📥 Running From Source
+
+Clone the repository:
+
+```powershell
+git clone https://github.com/YOUR_USERNAME/GameSaveEditor.git
+cd GameSaveEditor
+```
+
+Restore dependencies:
+
+```powershell
 dotnet restore
 ```
 
-**Debug Build**
-```bash
-dotnet build --configuration Debug --framework net10.0-windows10.0.19041.0
+Build:
+
+```powershell
+dotnet build -c Release
 ```
 
-**Release Build**
-```bash
-dotnet build --configuration Release --framework net10.0-windows10.0.19041.0
+Run the Windows target from Visual Studio or the command line.
+
+---
+
+# 📦 Publishing a Windows Build
+
+The application can be published as a self-contained Windows application.
+
+```powershell
+dotnet publish GameSaveEditor.csproj `
+    -f net10.0-windows10.0.19041.0 `
+    -c Release `
+    -p:RuntimeIdentifierOverride=win-x64 `
+    -p:WindowsPackageType=None `
+    -p:WindowsAppSDKSelfContained=true
 ```
 
-### Run the Application
+The resulting files will be located under:
 
-**From Visual Studio**
-- Press `F5` to run with debugging
-- Press `Ctrl+F5` to run without debugging
-
-**From Command Line**
-```bash
-dotnet run --framework net10.0-windows10.0.19041.0
+```text
+bin/
+└── Release/
+    └── net10.0-windows10.0.19041.0/
+        └── win-x64/
+            └── publish/
 ```
 
-### Create Installer (Release)
+The directory should contain:
 
-For creating a Windows installer, use MSIX or WiX toolset:
+```text
+GameSaveEditor.exe
+...
+```
 
-```bash
-# Build for release
-dotnet build --configuration Release --framework net10.0-windows10.0.19041.0
+### Important
 
-# Package as MSIX
-dotnet publish --configuration Release --framework net10.0-windows10.0.19041.0
+The **entire `publish` directory** is required.
+
+Do not distribute only:
+
+```text
+GameSaveEditor.exe
+```
+
+unless the application has specifically been configured for a single-file deployment.
+
+---
+
+# 📦 Creating the Installer
+
+The project uses **Inno Setup** to create a conventional Windows installer.
+
+Install Inno Setup 6 and open:
+
+```text
+Installer/
+└── GameSaveEditor.iss
+```
+
+Then select:
+
+```text
+Build
+    ↓
+Compile
+```
+
+The installer will package the published application into:
+
+```text
+Build/
+└── Installer/
+    └── GameSaveEditor-1.0.0-Setup.exe
 ```
 
 ---
 
-## Contributing
+# ⚙️ Automated Release Build
 
-Contributions are welcome! Please follow these guidelines:
+The repository includes:
 
-### Before Contributing
+```text
+Build/
+├── Publish-Windows.ps1
+└── Publish-Windows.bat
+```
 
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/your-feature-name`
-3. Ensure your code follows the project's coding standards
-4. Write or update tests as needed
+Run:
 
-### Submitting Changes
+```powershell
+.\Build\Publish-Windows.ps1
+```
 
-1. Commit your changes: `git commit -am 'Add your commit message'`
-2. Push to the branch: `git push origin feature/your-feature-name`
-3. Create a Pull Request with a clear description
-4. Link any related issues in your PR description
+Or:
 
-### Coding Standards
+```text
+Build/Publish-Windows.bat
+```
 
-- Follow [Microsoft C# Coding Conventions](https://docs.microsoft.com/en-us/dotnet/csharp/fundamentals/coding-style/coding-conventions)
-- Use meaningful variable and method names
-- Add XML documentation comments to public APIs
-- Keep methods focused and concise
-- Use async/await for I/O operations
+### Skip installer creation
 
-### Testing
+```powershell
+.\Build\Publish-Windows.ps1 -SkipInstaller
+```
 
-Before submitting a PR:
-- Ensure all existing tests pass
-- Add tests for new functionality
-- Test on Windows 10 and Windows 11
-- Test edge cases and error conditions
-- Verify UI responsiveness and performance
+### Clean build
 
----
+```powershell
+.\Build\Publish-Windows.ps1 -Clean
+```
 
-## License
+### Clean build without installer
 
-This project is currently unlicensed. By contributing to this project, you agree to allow the repository owner to decide on the appropriate license in the future.
-
-For more information about choosing a license, see [Choose a License](https://choosealicense.com/).
+```powershell
+.\Build\Publish-Windows.ps1 -Clean -SkipInstaller
+```
 
 ---
 
-## Support
+# 📁 Project Structure
 
-### Getting Help
-
-- **Issues**: Report bugs or request features via [GitHub Issues](https://github.com/vEnoch24/GameSaveEditor/issues)
-- **Discussions**: Join the conversation in [GitHub Discussions](https://github.com/vEnoch24/GameSaveEditor/discussions)
-- **Documentation**: Check the [Wiki](https://github.com/vEnoch24/GameSaveEditor/wiki) for additional documentation
-
-### Common Issues
-
-#### Application Won't Start
-- Ensure .NET 10.0 runtime is installed
-- Check that all required Windows components are available
-- Run as Administrator if permission issues occur
-- Review Windows Event Viewer for error details
-
-#### Database Errors
-- Verify database file isn't corrupted
-- Try restoring from a backup using BackupService
-- Clear application cache and restart
-- Check disk space and permissions
-
-#### Save File Not Loading
-- Confirm the save file format is supported
-- Check file permissions and ensure read access
-- Ensure sufficient disk space available
-- Verify the save file isn't corrupted
-
-#### Performance Issues
-- Close other applications to free up system memory
-- Check available disk space (minimum 100 MB required)
-- Update graphics drivers and Windows updates
-- Disable unnecessary background applications
+```text
+GameSaveEditor/
+│
+├── App.xaml
+├── App.xaml.cs
+├── MauiProgram.cs
+├── GameSaveEditor.csproj
+│
+├── Components/
+│   ├── Layout/
+│   └── Pages/
+│
+├── Models/
+│   ├── DatabaseColumn.cs
+│   ├── DatabaseForeignKey.cs
+│   ├── DatabaseProfile.cs
+│   ├── DatabaseRow.cs
+│   └── DatabaseTable.cs
+│
+├── Services/
+│   ├── AppSettingsService.cs
+│   ├── BackupService.cs
+│   ├── DatabaseProbeService.cs
+│   ├── DatabaseService.cs
+│   ├── KeyVaultService.cs
+│   └── ProfileService.cs
+│
+├── Properties/
+│   └── PublishProfiles/
+│       └── Windows-x64-Unpackaged.pubxml
+│
+├── Installer/
+│   ├── GameSaveEditor.iss
+│   └── GameSaveEditor.ico
+│
+├── Build/
+│   ├── Publish-Windows.ps1
+│   └── Publish-Windows.bat
+│
+├── docs/
+│   └── screenshots/
+│
+├── README.md
+└── .gitignore
+```
 
 ---
 
-## Acknowledgments
+# 🏗️ Architecture
 
-- Built with [.NET MAUI](https://github.com/dotnet/maui)
-- Uses [SQLite](https://www.sqlite.org/) and [SQLCipher](https://www.zetetic.net/sqlcipher/) for data storage
-- UI framework powered by [Blazor](https://dotnet.microsoft.com/apps/aspnet/web-apps/blazor)
-- Windows integration via [Windows App SDK](https://docs.microsoft.com/en-us/windows/apps/windows-app-sdk/)
+The application follows a service-oriented architecture.
+
+```text
+                    ┌──────────────────────┐
+                    │      Blazor UI       │
+                    │                      │
+                    │  Table Viewer        │
+                    │  Database Wizard     │
+                    │  Profiles            │
+                    │  Backup Manager      │
+                    │  Query Console       │
+                    └──────────┬───────────┘
+                               │
+                               ▼
+                    ┌──────────────────────┐
+                    │      Services        │
+                    ├──────────────────────┤
+                    │ DatabaseService      │
+                    │ BackupService        │
+                    │ ProfileService       │
+                    │ KeyVaultService      │
+                    │ DatabaseProbeService │
+                    └──────────┬───────────┘
+                               │
+                               ▼
+                    ┌──────────────────────┐
+                    │ SQLite / SQLCipher   │
+                    │                      │
+                    │ Microsoft.Data.Sqlite│
+                    │ SQLCipher Native     │
+                    └──────────────────────┘
+```
 
 ---
 
-## Project Status
+# 🔧 Technology Stack
 
-This project is actively under development. Features and APIs may change without notice during early development phases. Currently optimized for Windows 10 and Windows 11.
+| Technology                     | Purpose                          |
+| ------------------------------ | -------------------------------- |
+| **C#**                         | Application logic                |
+| **.NET 10**                    | Runtime/framework                |
+| **.NET MAUI**                  | Native Windows application shell |
+| **Blazor Hybrid**              | UI layer                         |
+| **Razor**                      | UI components                    |
+| **Microsoft.Data.Sqlite.Core** | SQLite access                    |
+| **SQLitePCLRaw**               | Native SQLite integration        |
+| **SQLCipher**                  | Encrypted SQLite support         |
+| **Windows DPAPI**              | Secure key storage               |
+| **Inno Setup**                 | Windows installer                |
+| **Git**                        | Version control                  |
 
 ---
 
-**Last Updated**: September 2026  
-**Maintainer**: [@vEnoch24](https://github.com/vEnoch24)  
-**Platform**: Windows 10/11 Only
+# 🔐 Security Considerations
+
+Game Save Editor is designed primarily as a **local desktop utility**.
+
+The application does not require a cloud service for database editing.
+
+Remembered encryption keys are protected using Windows DPAPI and stored separately from normal profile configuration.
+
+However:
+
+> **This application should not be considered a secure credential manager.**
+
+Users should only use the key-memory feature on trusted Windows accounts and machines.
+
+The application also does not attempt to bypass server-side authentication, online validation, DRM, or other game security systems.
+
+It operates on database files provided by the user.
+
+---
+
+# 💡 Typical Use Cases
+
+Game Save Editor can be useful for:
+
+### 🎮 Game developers
+
+Inspect local save data during development.
+
+### 🧪 QA
+
+Investigate unusual save states and reproduce game-state bugs.
+
+### 🔍 Modding
+
+Inspect locally stored game data where modification is permitted.
+
+### 🛠️ Tools development
+
+Experiment with SQLite-backed game data structures.
+
+### 📊 Data inspection
+
+Quickly inspect relationships and values without opening a database CLI.
+
+---
+
+# 🧭 Roadmap
+
+The project is actively evolving.
+
+Potential future features include:
+
+* [ ] Advanced database-side pagination
+* [ ] Native SQLite expression sorting
+* [ ] Column visibility controls
+* [ ] Column resizing and reordering
+* [ ] Freeze columns
+* [ ] Advanced filtering
+* [ ] Saved table filters
+* [ ] Find & Replace
+* [ ] Bulk increment/decrement operations
+* [ ] Bulk mathematical transformations
+* [ ] Copy/paste spreadsheet-style ranges
+* [ ] Import/export CSV
+* [ ] Import/export JSON
+* [ ] Database comparison
+* [ ] Diff between two save files
+* [ ] Schema visualization
+* [ ] Database relationship graph
+* [ ] More SQLCipher versions
+* [ ] Additional cipher configuration support
+* [ ] Plugin architecture for game-specific formats
+* [ ] Game-specific editor profiles
+* [ ] Custom field editors
+* [ ] Automated save validation
+* [ ] Advanced backup/version history
+* [ ] Portable mode
+* [ ] Single-file publishing
+* [ ] Automated GitHub Releases
+* [ ] CI/CD build pipeline
+
+---
+
+# 🧩 Planned Bulk Editing Improvements
+
+The Phase 2 selection system provides the foundation for more powerful batch operations.
+
+Future operations could include:
+
+```text
+Set Value
+Set NULL
+Increment
+Decrement
+Multiply
+Divide
+Add Prefix
+Add Suffix
+Find & Replace
+Convert Type
+```
+
+For example:
+
+```text
+Gold
+
+Selected:
+    100
+    250
+    500
+    750
+
+Operation:
+    Multiply
+
+Value:
+    2
+
+Result:
+    200
+    500
+    1000
+    1500
+```
+
+These operations will continue to use the staged-change system so they can be reviewed and undone before saving.
+
+---
+
+# 🐛 Known Limitations
+
+### Loaded row limit
+
+The editor currently loads a maximum of approximately:
+
+```text
+5,000 rows
+```
+
+at once.
+
+### Pagination
+
+Pagination is currently performed over the loaded dataset rather than directly against SQLite.
+
+### Numeric sorting
+
+Some sorting operations currently operate on loaded string representations and may not perfectly reproduce SQLite's native numeric ordering for mixed-type data.
+
+### SQLCipher versions
+
+SQLCipher 4 is the primary supported encrypted database configuration.
+
+SQLCipher 3 and custom configurations are represented by profiles but require additional provider support before they can be opened.
+
+### Windows
+
+The current release is primarily intended for:
+
+```text
+Windows x64
+```
+
+---
+
+# 🧑‍💻 Development
+
+Contributions are welcome.
+
+A typical development workflow is:
+
+```text
+Create branch
+     ↓
+Implement feature
+     ↓
+Test database operations
+     ↓
+Test backup/rollback
+     ↓
+Test encrypted database
+     ↓
+Test UI
+     ↓
+Build Release
+     ↓
+Submit Pull Request
+```
+
+When working on database functionality, always test against a **copy** of the original save file.
+
+---
+
+# ⚠️ Important: Back Up Your Saves
+
+Although the application includes automatic backups, users should still maintain their own backups of important game saves.
+
+Before experimenting with an unfamiliar database:
+
+```text
+Original Save
+     │
+     ├──► Personal Backup
+     │
+     └──► Game Save Editor
+```
+
+Never assume that an unknown database format can be safely modified.
+
+---
+
+
+# 🙏 Acknowledgements
+
+This project makes use of several excellent open-source technologies:
+
+* .NET
+* .NET MAUI
+* Blazor
+* SQLite
+* SQLCipher
+* Microsoft.Data.Sqlite
+* SQLitePCLRaw
+* Inno Setup
+
+See the respective projects and licenses for additional information.
+
+---
+
+# ⭐ Support the Project
+
+If you find Game Save Editor useful:
+
+<p align="center">
+
+<a href="https://github.com/YOUR_USERNAME/GameSaveEditor">
+<img src="https://img.shields.io/badge/⭐%20Star%20on%20GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="Star on GitHub">
+</a>
+
+<a href="https://github.com/YOUR_USERNAME/GameSaveEditor/issues">
+<img src="https://img.shields.io/badge/🐛%20Report%20Issue-D73A49?style=for-the-badge&logo=github&logoColor=white" alt="Report Issue">
+</a>
+
+<a href="https://github.com/YOUR_USERNAME/GameSaveEditor/releases">
+<img src="https://img.shields.io/badge/⬇️%20Releases-2EA44F?style=for-the-badge&logo=github&logoColor=white" alt="Releases">
+</a>
+
+</p>
+
+---
+
+# 📬 Issues & Feature Requests
+
+Found a bug or have an idea?
+
+Open an issue:
+
+```text
+GitHub
+    ↓
+Issues
+    ↓
+New Issue
+```
+
+When reporting a database-related issue, please include:
+
+* Windows version
+* Application version
+* Database type
+* SQLite / SQLCipher version if known
+* Error message
+* Relevant logs
+* Steps to reproduce
+
+**Do not upload or publicly share personal save files containing sensitive information.**
+
+---
+
+# 📌 Project Status
+
+<p align="center">
+
+<img src="https://img.shields.io/badge/Status-Active-success?style=for-the-badge" alt="Active">
+
+<img src="https://img.shields.io/badge/Version-7.0.0-blue?style=for-the-badge" alt="Version 7.0.0">
+
+<img src="https://img.shields.io/badge/Windows-x64-0078D4?style=for-the-badge&logo=windows&logoColor=white" alt="Windows x64">
+
+</p>
+
+**Current release:** `v7.0.0`
+
+The project is actively being developed toward a more powerful, extensible game-save inspection and editing toolkit.
+
+---
+
+<p align="center">
+  <strong>🎮 Inspect. Edit. Backup. Restore.</strong>
+</p>
+
+<p align="center">
+  Built for developers, testers, modders, and anyone who needs a better way to work with game save databases.
+</p>

@@ -11,10 +11,7 @@
 <PageTitle>Save Database Explorer</PageTitle>
 
 <div class="page">
-
-    <!-- ============================================================== -->
-    <!-- TOP BAR -->
-    <!-- ============================================================== -->
+    <!-- Top Bar -->
     <header class="topbar">
         <div class="brand">
             <div class="brand-mark">DB</div>
@@ -31,19 +28,16 @@
                     @Database.ActiveProfile?.Name · Editable
                 </div>
             }
-            <button class="btn btn-secondary" @onclick="ShowOpenWizard">
-                Open database
-            </button>
+            <button class="btn btn-secondary" @onclick="ShowOpenWizard">Open database</button>
         </div>
     </header>
 
-    <!-- ============================================================== -->
-    <!-- MESSAGE BANNERS -->
-    <!-- ============================================================== -->
+    <!-- Messages -->
     @if (_message is not null)
     {
         <div class="success-banner">
-            <span>✓</span> @_message
+            <span>✓</span>
+            @_message
             <button class="icon-button" @onclick="() => _message = null">×</button>
         </div>
     }
@@ -59,14 +53,10 @@
         </div>
     }
 
-    <!-- ============================================================== -->
-    <!-- MAIN WORKSPACE -->
-    <!-- ============================================================== -->
+    <!-- Main Workspace -->
     <main class="workspace">
-
-        <!-- SIDEBAR -->
+        <!-- Sidebar -->
         <aside class="sidebar">
-
             <!-- Database Info -->
             <div class="sidebar-section">
                 <div class="section-label">DATABASE</div>
@@ -113,12 +103,9 @@
 
             <!-- Sidebar Actions -->
             <div class="sidebar-footer">
-                @if (Database.IsOpen)
-                {
-                    <button class="sidebar-action" @onclick="ShowOpenWizard">
-                        <span>＋</span> Open another database
-                    </button>
-                }
+                <button class="sidebar-action" @onclick="ShowOpenWizard">
+                    <span>＋</span> Open another database
+                </button>
                 <button class="sidebar-action" @onclick="() => _showProfiles = true">
                     <span>◈</span> Database profiles
                 </button>
@@ -135,12 +122,10 @@
                     </button>
                 }
             </div>
-
         </aside>
 
-        <!-- CONTENT AREA -->
+        <!-- Content -->
         <section class="content">
-
             @if (!Database.IsOpen)
             {
                 <!-- Welcome Screen -->
@@ -159,11 +144,12 @@
                         Encryption keys remain in memory only.
                     </div>
 
+                    <!-- Quick Profiles -->
                     <div class="quick-profiles">
                         <div class="section-label">QUICK OPEN</div>
                         @foreach (var p in Profiles.All
-                                            .Where(x => !string.IsNullOrWhiteSpace(x.DatabasePath))
-                                            .OrderByDescending(x => x.LastUsedUtc))
+                            .Where(x => !string.IsNullOrWhiteSpace(x.DatabasePath))
+                            .OrderByDescending(x => x.LastUsedUtc))
                         {
                             <button class="quick-profile" @onclick="() => OpenProfileAsync(p)">
                                 <span>◈</span>
@@ -194,16 +180,10 @@
                              OnError="SetError"
                              OnMessage="SetMessage" />
             }
-
         </section>
-
     </main>
 
-    <!-- ============================================================== -->
-    <!-- MODALS -->
-    <!-- ============================================================== -->
-
-    <!-- Open Database Wizard -->
+    <!-- Modals -->
     @if (_showOpenWizard)
     {
         <div class="modal-backdrop">
@@ -211,7 +191,7 @@
                 <div class="modal-header">
                     <div>
                         <div class="eyebrow">OPEN DATABASE</div>
-                        <h3>Database setup wizard</h3>
+                        <h2>Database setup wizard</h2>
                     </div>
                     <button class="icon-button" @onclick="CloseOpenWizard">×</button>
                 </div>
@@ -224,7 +204,6 @@
         </div>
     }
 
-    <!-- Backup Manager -->
     @if (_showBackups)
     {
         <div class="modal-backdrop">
@@ -232,7 +211,7 @@
                 <div class="modal-header">
                     <div>
                         <div class="eyebrow">TOOLS</div>
-                        <h3>Backup manager</h3>
+                        <h2>Backup manager</h2>
                     </div>
                     <button class="icon-button" @onclick="() => _showBackups = false">×</button>
                 </div>
@@ -244,7 +223,6 @@
         </div>
     }
 
-    <!-- Query Console -->
     @if (_showQuery)
     {
         <div class="modal-backdrop">
@@ -252,7 +230,7 @@
                 <div class="modal-header">
                     <div>
                         <div class="eyebrow">TOOLS</div>
-                        <h3>Query console</h3>
+                        <h2>Query console</h2>
                     </div>
                     <button class="icon-button" @onclick="() => _showQuery = false">×</button>
                 </div>
@@ -261,15 +239,14 @@
         </div>
     }
 
-    <!-- Profile Manager -->
     @if (_showProfiles)
     {
         <div class="modal-backdrop">
             <div class="modal-card xlarge-modal">
                 <div class="modal-header">
                     <div>
-                        @* <div class="eyebrow">CONFIGURATION</div>
-                        <h2>Database profiles</h2> *@
+                        <div class="eyebrow">CONFIGURATION</div>
+                        <h2>Database profiles</h2>
                     </div>
                     <button class="icon-button" @onclick="() => _showProfiles = false">×</button>
                 </div>
@@ -278,13 +255,14 @@
         </div>
     }
 
-    <!-- Settings Panel -->
     @if (_showSettings)
     {
         <div class="modal-backdrop">
             <div class="modal-card wide-modal">
                 <div class="modal-header">
                     <div>
+                        <div class="eyebrow">APPLICATION</div>
+                        <h2>Settings</h2>
                     </div>
                     <button class="icon-button" @onclick="() => _showSettings = false">×</button>
                 </div>
@@ -292,16 +270,10 @@
             </div>
         </div>
     }
-
 </div>
 
-<!-- ============================================================== -->
-<!-- CODE BLOCK -->
-<!-- ============================================================== -->
 @code {
-    // =============================================================
-    // FIELDS
-    // =============================================================
+    // ===== State Fields =====
     private string? _error;
     private string? _message;
     private string? _databaseName;
@@ -313,9 +285,7 @@
     private bool _showProfiles;
     private bool _showSettings;
 
-    // =============================================================
-    // LIFECYCLE
-    // =============================================================
+    // ===== Lifecycle Methods =====
     protected override async Task OnInitializedAsync()
     {
         if (File.Exists(DatabaseConfiguration.DefaultDatabasePath))
@@ -328,7 +298,6 @@
                     DatabaseConfiguration.DefaultEncryptionKey,
                     profile
                 );
-
                 Profiles.SetSessionKey(profile.Id, DatabaseConfiguration.DefaultEncryptionKey);
                 _databaseName = Path.GetFileName(Database.DatabasePath);
                 Profiles.MarkUsed(profile, Database.DatabasePath);
@@ -340,9 +309,7 @@
         }
     }
 
-    // =============================================================
-    // WIZARD
-    // =============================================================
+    // ===== Modal Controls =====
     private void ShowOpenWizard()
     {
         _error = null;
@@ -356,6 +323,7 @@
         _showOpenWizard = false;
     }
 
+    // ===== Event Handlers =====
     private Task HandleOpened(string path)
     {
         _databaseName = Path.GetFileName(path);
@@ -365,9 +333,6 @@
         return Task.CompletedTask;
     }
 
-    // =============================================================
-    // PROFILE OPERATIONS
-    // =============================================================
     private async Task OpenProfileAsync(DatabaseProfile p)
     {
         _error = null;
@@ -398,9 +363,6 @@
         }
     }
 
-    // =============================================================
-    // TABLE OPERATIONS
-    // =============================================================
     private async Task SelectTableAsync(DatabaseTable t)
     {
         try
@@ -414,9 +376,6 @@
         }
     }
 
-    // =============================================================
-    // BACKUP OPERATIONS
-    // =============================================================
     private async Task RestoreBackupAsync(string backupPath)
     {
         try
@@ -443,9 +402,7 @@
         }
     }
 
-    // =============================================================
-    // UI HELPERS
-    // =============================================================
+    // ===== Message Helpers =====
     private void SetError(string m)
     {
         _error = m;
@@ -460,14 +417,11 @@
         InvokeAsync(StateHasChanged);
     }
 
+    // ===== Utility Methods =====
     private static string ToUserMessage(Exception ex)
-    {
-        if (ex is NotSupportedException)
-            return ex.Message;
-
-        if (ex is Microsoft.Data.Sqlite.SqliteException)
-            return "SQLite could not read the database with the selected profile/key. Verify the key and encryption format.";
-
-        return ex.Message;
-    }
+        => ex is NotSupportedException
+            ? ex.Message
+            : ex is Microsoft.Data.Sqlite.SqliteException
+                ? "SQLite could not read the database with the selected profile/key. Verify the key and encryption format."
+                : ex.Message;
 }
