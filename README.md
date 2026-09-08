@@ -1067,7 +1067,7 @@ Potential future features include:
 
 # 🧩 Planned Bulk Editing Improvements
 
-The Phase 2 selection system provides the foundation for more powerful batch operations.
+The Phase 3 selection system provides the foundation for more powerful batch operations.
 
 Future operations could include:
 
@@ -1218,15 +1218,15 @@ If you find Game Save Editor useful:
 
 <p align="center">
 
-<a href="https://github.com/YOUR_USERNAME/GameSaveEditor">
+<a href="https://github.com/vEnoch24/GameSaveEditor">
 <img src="https://img.shields.io/badge/⭐%20Star%20on%20GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="Star on GitHub">
 </a>
 
-<a href="https://github.com/YOUR_USERNAME/GameSaveEditor/issues">
+<a href="https://github.com/vEnoch24/GameSaveEditor/issues">
 <img src="https://img.shields.io/badge/🐛%20Report%20Issue-D73A49?style=for-the-badge&logo=github&logoColor=white" alt="Report Issue">
 </a>
 
-<a href="https://github.com/YOUR_USERNAME/GameSaveEditor/releases">
+<a href="https://github.com/vEnoch24/GameSaveEditor/releases">
 <img src="https://img.shields.io/badge/⬇️%20Releases-2EA44F?style=for-the-badge&logo=github&logoColor=white" alt="Releases">
 </a>
 
@@ -1268,13 +1268,13 @@ When reporting a database-related issue, please include:
 
 <img src="https://img.shields.io/badge/Status-Active-success?style=for-the-badge" alt="Active">
 
-<img src="https://img.shields.io/badge/Version-7.0.0-blue?style=for-the-badge" alt="Version 7.0.0">
+<img src="https://img.shields.io/badge/Version-2.0.0-blue?style=for-the-badge" alt="Version 2.0.0">
 
 <img src="https://img.shields.io/badge/Windows-x64-0078D4?style=for-the-badge&logo=windows&logoColor=white" alt="Windows x64">
 
 </p>
 
-**Current release:** `v7.0.0`
+**Current release:** `v2.0.0`
 
 The project is actively being developed toward a more powerful, extensible game-save inspection and editing toolkit.
 

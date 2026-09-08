@@ -103,9 +103,13 @@
 
             <!-- Sidebar Actions -->
             <div class="sidebar-footer">
-                <button class="sidebar-action" @onclick="ShowOpenWizard">
-                    <span>＋</span> Open another database
-                </button>
+                @if (Database.IsOpen)
+                {
+                    <button class="sidebar-action" @onclick="ShowOpenWizard">
+                        <span>＋</span> Open another database
+                    </button>
+                }
+                
                 <button class="sidebar-action" @onclick="() => _showProfiles = true">
                     <span>◈</span> Database profiles
                 </button>
